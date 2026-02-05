@@ -8,7 +8,7 @@
    
 2. Clone this repo to a new directory named `jam.p64`. This will serve as the game cartridge:
 
-   `git clone https://github.com/breadsliceninja/picotron-jam jam.p64`
+   `git clone https://github.com/breadsliceninja/picotron-jam.git jam.p64`
    
 3. Launch Picotron and run `load jam.p64` in the Picotron terminal (rightmost icon in the top bar, or hit ESC).
    
