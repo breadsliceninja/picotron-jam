@@ -60,17 +60,23 @@ function move_player()
 	end
 
 
---	if proposed_x <= p.x and mget((proposed_x)/16, p.y/16) != 4 then
---		p.x = proposed_x
---	end 
---	-- above/below tile checking
---	if proposed_y >= p.y and mget(p.x/16, (proposed_y + p.height)/16) != 4 then
---		p.y = proposed_y
+	p.sx *= 0.90
+	p.sy *= 0.90
+	-- if not moving left or right, deccel x axis
+--	if not (
+--		btn(0) or
+--		btn(1) or
+--		btn(2) or
+--		btn(3)
+--		)
+--	 then
+--	 -- 0.95 for that luigi wavedash feel
+--		p.sx *= 0.85
+--		p.sy *= 0.85
 --	end
---	if proposed_y <= p.y and mget(p.x/16, p.y/16) != 4 then
---		p.y = proposed_y
---	end	
---	p.x += mid(-p.smax, p.vx, p.smax)
---	p.y += mid(-p.smax, p.vy, p.smax)
+	
+	
+	p.x += mid(-p.smax, p.sx, p.smax)
+	p.y += mid(-p.smax, p.sy, p.smax)
 
 end
