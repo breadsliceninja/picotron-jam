@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 04:19:28",revision=135]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 05:22:13",revision=140]]
 -- testing
 include "movement.lua"
 function _init()
@@ -10,7 +10,9 @@ function _init()
 		vy = 0,
 		smax = 3,
 		width = 32,
-		height = 32
+		height = 32,
+		x_offset = 4,
+		y_offset = 4
 	}
 	-- collision blocks
 	c = {4,}
