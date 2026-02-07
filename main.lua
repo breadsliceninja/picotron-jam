@@ -7,14 +7,19 @@ function _init()
 	p = {
 		x = 16*4,
 		y = 16*4,
-		sx = 0,
-		sy = 0,
+		vx = 0,
+		vy = 0,
 		smax = 3,
-		s = 11,
+		width = 32,
+		height = 32,
+		x_offset = 4,
+		y_offset = 4,
 		facing = "down",
 		anim_t = anim_dly,
 		anim_alt = false,
 	}
+	-- collision blocks
+	c = {4,}
 	-- acceleration
 	a = 0.3
 	-- animation
