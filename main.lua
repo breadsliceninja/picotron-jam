@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 07:58:45",revision=427]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 08:16:41",revision=465]]
 -- testing
 include "movement.lua"
 function _init()
@@ -20,7 +20,9 @@ function _init()
 	-- camera
 	cam = {
 		offset_x = 0,
-		offset_y = 0
+		offset_y = 0,
+		target_offset_x = 0,
+		target_offset_y = 0,
 	}
 	
 	-- world & stairs
@@ -40,9 +42,39 @@ function _init()
 	world.next_map = next_layer[1].bmp
 end
 
+function calc_new_camera_bounds()
+	screen_width = 480
+	screen_height = 270
+	
+	screen_buffer_x = screen_width/4
+	screen_buffer_y = screen_height/4
+	
+	if world.do_stair_climb then return end
+	
+	player_screen_pos_x = p.x + cam.offset_x
+	player_screen_pos_y = p.y + cam.offset_y
+	
+	if player_screen_pos_x < screen_buffer_x then
+		cam.target_offset_x -= player_screen_pos_x - screen_buffer_x
+	end
+	
+	if player_screen_pos_x > screen_width - screen_buffer_x then
+		cam.target_offset_x += (screen_width - screen_buffer_x) - player_screen_pos_x
+	end
+	
+	if player_screen_pos_y < screen_buffer_y then
+		cam.target_offset_y -= player_screen_pos_y - screen_buffer_y
+	end
+	
+	if player_screen_pos_y > screen_height - screen_buffer_y then
+		cam.target_offset_y += (screen_height - screen_buffer_y) - player_screen_pos_y
+	end
+end
+
 function _update()
 	-- called each frame (60 times)
 	move_player()
+	calc_new_camera_bounds()
 end
 
 function math.lerp(a,b,t)
@@ -57,6 +89,10 @@ function _draw()
 	-- draw graphics teehee
 	-- each tile is 16x16
 	cls()
+	
+	-- Update camera
+	cam.offset_x = math.lerp(cam.offset_x, cam.target_offset_x, 0.5)
+	cam.offset_y = math.lerp(cam.offset_y, cam.target_offset_y, 0.5)
 	
 	if world.previous_map then
 		map(world.previous_map, 0, 0,
@@ -76,7 +112,7 @@ function _draw()
 		new_layer_y_offset = math.lerp(0, overlap_scroll, player_progress)
 		old_layer_y_offset = math.lerp(0, overlap_scroll + world.parallax_offset,
 												player_progress)
-		map(0, 0, 0, old_layer_y_offset * 16)
+		map(0, 0, cam.offset_x, cam.offset_y + old_layer_y_offset * 16)
 		
 		if player_progress > 0.3 then
 			map(world.next_map, 0, 0,
@@ -96,6 +132,8 @@ function _draw()
 			-- Update camera offset
 			cam.offset_x += 0
 			cam.offset_y += 16 * overlap_scroll
+			cam.target_offset_x = cam.offset_x
+			cam.target_offset_y = cam.offset_y
 			
 			-- Update player location
 			p.y -= 16 * overlap_scroll
