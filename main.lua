@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 10:16:18",revision=164]]
+--[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-07 10:53:33",revision=1]]
 -- testing
 include "movement.lua"
 function _init()
@@ -31,34 +31,44 @@ function _init()
 	}
 	-- camera
 	cam = {
+		-- "real" offset (read from these ones)
 		offset_x = 0,
 		offset_y = 0,
+		-- desired offset (set these ones)
 		target_offset_x = 0,
 		target_offset_y = 0,
 	}
+	
 	-- world & stairs
 	world = {
-		parallax_offset = 1, -- size of tile parallax offset between layers
 		do_stair_climb = false, -- are we currently climbing stairs
+		stair_climb_start_y = nil,
+		stair_climb_end_y = nil,
 		current_map = nil,
 		previous_map = nil,
-		next_map = nil
+		previous_previous_map = nil, -- this is dumb
+		next_map = nil,
+		parallax = {
+			-- multiplier for parallax offset between layers
+			multiplier = 0.9,
+		}
 	}
+	
+	screen_width = 480
+	screen_height = 270
 	
 	base_layer = fetch("map/0.map")
 	next_layer = fetch("map/1.map")
+	layer_after = fetch("map/2.map")
 	
 	world.current_map = base_layer[1].bmp
 	world.previous_map = nil
 	world.next_map = next_layer[1].bmp
 end
 
-function calc_new_camera_bounds()
-	screen_width = 480
-	screen_height = 270
-	
-	screen_buffer_x = screen_width/4
-	screen_buffer_y = screen_height/4
+function calc_new_camera_bounds()	
+	screen_buffer_x = screen_width/3
+	screen_buffer_y = screen_height/3
 	
 	if world.do_stair_climb then return end
 	
@@ -107,31 +117,55 @@ function _draw()
 	-- each tile is 16x16
 	cls()
 	
+	local cube_coords = {
+		--  Front face
+    -1.0, -1.0,  1.0,
+     1.0, -1.0,  1.0,
+     1.0,  1.0,  1.0,
+    -1.0,  1.0,  1.0,
+     -- Back face
+    -1.0, -1.0, -1.0,
+     1.0, -1.0, -1.0,
+     1.0,  1.0, -1.0,
+    -1.0,  1.0, -1.0
+	}
+	
+	-- Set clip to prevent drawing underlayers behind current layer
+	local clip_rect_x = max(cam.offset_x, 0)
+	local clip_rect_y = max(cam.offset_y, 0)
+	clip(clip_rect_x, clip_rect_y, screen_width, screen_height)
+	
 	-- Update camera
 	cam.offset_x = math.lerp(cam.offset_x, cam.target_offset_x, 0.5)
 	cam.offset_y = math.lerp(cam.offset_y, cam.target_offset_y, 0.5)
 	
+	if world.previous_previous_map then
+		map(world.previous_previous_map, 0, 0,
+			cam.offset_x * world.parallax.multiplier ^ 2,
+			cam.offset_y * world.parallax.multiplier ^ 2)
+	end
+	
 	if world.previous_map then
 		map(world.previous_map, 0, 0,
-			cam.offset_x + 0,
-			cam.offset_y + world.parallax_offset * 16)
+			cam.offset_x * world.parallax.multiplier,
+			cam.offset_y * world.parallax.multiplier)
 	end
 	
 	-- Stair climbing logic, overrides all other camera and map rendering logic
 	if world.do_stair_climb then
-	   start_y = 9
-	   end_y = 5
-	   player_progress = math.clamp((start_y - p.y/16) / (start_y - end_y), 0.0, 1.0)
-		
-		-- The bottom level has to move 1.x tiles for every 1 tile scrolled in order
+	   local start_y = world.stair_climb_start_y
+	   local end_y = world.stair_climb_end_y
+	   local player_progress = math.clamp((start_y - p.y/16) / (start_y - end_y), 0.0, 1.0)
+	   
+	   -- The bottom level has to move 1.x tiles for every 1 tile scrolled in order
 		-- to achieve the eventual offset between the level
-		overlap_scroll = 3
-		new_layer_y_offset = math.lerp(0, overlap_scroll, player_progress)
-		old_layer_y_offset = math.lerp(0, overlap_scroll + world.parallax_offset,
-												player_progress)
+		local overlap_scroll = 3
+		
+		local new_layer_y_offset = math.lerp(0, overlap_scroll, player_progress)
+		local old_layer_y_offset = math.lerp(0, overlap_scroll * world.parallax.multiplier, player_progress)
 		map(0, 0, cam.offset_x, cam.offset_y + old_layer_y_offset * 16)
 		
-		if player_progress > 0.3 then
+		if player_progress > 0.5 then
 			map(world.next_map, 0, 0,
 				cam.offset_x + 0,
 				cam.offset_y + new_layer_y_offset * 16)
@@ -142,9 +176,10 @@ function _draw()
 			world.do_stair_climb = false
 			
 			-- Update maps
+			world.previous_previous_map = world.previous_map
 			world.previous_map = world.current_map
 			world.current_map = world.next_map
-			world.next_map = nil -- probably fix this at some point
+			world.next_map = layer_after[1].bmp -- probably fix this at some point
 			
 			-- Update camera offset
 			cam.offset_x += 0
@@ -160,10 +195,15 @@ function _draw()
 		map(0, 0, cam.offset_x, cam.offset_y)
 	end
 	
+	-- Render black borders for +5 outside the toplevel map
+	
+	
 	-- Check if we are on stairs and initiate a climb
 	player_center = mget((p.x + (p.width/2))/16, (p.y + (p.height/2))/16);
 	if not world.do_stair_climb and player_center == 7 then
 		world.do_stair_climb = true
+		world.stair_climb_start_y = (p.y + (p.height/2))/16
+		world.stair_climb_end_y = world.stair_climb_start_y - 4
 	end
 	
 	local p_sprite = facing_sprites[p.facing]
