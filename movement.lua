@@ -1,5 +1,4 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 04:37:55",revision=81]]
-include "math.lua"
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 04:47:49",revision=82]]
 function move_player()
     START_SPEED = 1
 	-- left
