@@ -1,4 +1,5 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 06:47:13",revision=7]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 09:20:59",revision=12]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 04:47:49",revision=82]]
 function move_player()
     START_SPEED = 1
 	-- left
@@ -9,9 +10,9 @@ function move_player()
 			not btn(3) 
 		)
 		then
-		p.sx = -START_SPEED 
+		p.vx = -START_SPEED 
 	elseif btnp(0) or btn(0) then
-		p.sx -= a
+		p.vx -= a
 		p.facing = "left"
 	end
 	-- right
@@ -22,9 +23,9 @@ function move_player()
 			not btn(3) 
 		)
 		then
-		p.sx = START_SPEED
+		p.vx = START_SPEED
 	elseif btnp(1) or btn(1) then
-		p.sx += a
+		p.vx += a
 		p.facing = "right"
 	end
 	-- up (if up and no other keys)
@@ -35,9 +36,9 @@ function move_player()
 			not btn(3) 
 		)
 		then
-		p.sy = -START_SPEED 
+		p.vy = -START_SPEED 
 	elseif btnp(2) or btn(2) then
-		p.sy -= a
+		p.vy -= a
 		p.facing = "up"
 	end
 	-- down
@@ -48,9 +49,9 @@ function move_player()
 			not btn(2) 
 		)
 		then
-		p.sy = START_SPEED 
+		p.vy = START_SPEED 
 	elseif btnp(3) or btn(3) then
-		p.sy += a
+		p.vy += a
 		p.facing = "down"
 	end
 	
@@ -60,8 +61,8 @@ function move_player()
 	end
 
 
-	p.sx *= 0.90
-	p.sy *= 0.90
+	p.vx *= 0.90
+	p.vy *= 0.90
 	-- if not moving left or right, deccel x axis
 --	if not (
 --		btn(0) or
@@ -71,12 +72,55 @@ function move_player()
 --		)
 --	 then
 --	 -- 0.95 for that luigi wavedash feel
---		p.sx *= 0.85
---		p.sy *= 0.85
+--		p.vx *= 0.85
+--		p.vy *= 0.85
 --	end
 	
+	proposed_x = p.x + mid(-p.smax, p.vx, p.smax)
+	proposed_y = p.y + mid(-p.smax, p.vy, p.smax)
+	-- left/right tile checking...
+	if proposed_x > p.x then
+		if mget((p.width + proposed_x)/16, p.y/16) != 4 then
+			p.x = proposed_x
+		else
+			p.x = (math.floor(proposed_x/16))*16
+		end
+	end
+	if proposed_x < p.x then
+		if mget(proposed_x/16, p.y/16) != 4 then
+			p.x = proposed_x
+		else
+			p.x = (math.ceil(proposed_x/16))*16
+		end
+	end
 	
-	p.x += mid(-p.smax, p.sx, p.smax)
-	p.y += mid(-p.smax, p.sy, p.smax)
+	if proposed_y <= p.y then
+		if mget(p.x/16, proposed_y/16) != 4 then
+			p.y = proposed_y
+		else
+			p.y = (math.ceil(proposed_y/16))*16
+		end
+	end
+	if proposed_y >= p.y then
+		if mget(p.x/16, (proposed_y+p.height)/16) != 4 then
+			p.y = proposed_y
+		else
+			p.y = (math.floor(proposed_y/16))*16
+		end
+	end
+
+
+--	if proposed_x <= p.x and mget((proposed_x)/16, p.y/16) != 4 then
+--		p.x = proposed_x
+--	end 
+--	-- above/below tile checking
+--	if proposed_y >= p.y and mget(p.x/16, (proposed_y + p.height)/16) != 4 then
+--		p.y = proposed_y
+--	end
+--	if proposed_y <= p.y and mget(p.x/16, p.y/16) != 4 then
+--		p.y = proposed_y
+--	end	
+--	p.x += mid(-p.smax, p.vx, p.smax)
+--	p.y += mid(-p.smax, p.vy, p.smax)
 
 end
