@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 10:21:21",revision=264]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 10:47:02",revision=272]]
 -- testing
 include "movement.lua"
 function _init()
@@ -116,6 +116,19 @@ function _draw()
 	-- draw graphics teehee
 	-- each tile is 16x16
 	cls()
+	
+	local cube_coords = {
+		--  Front face
+    -1.0, -1.0,  1.0,
+     1.0, -1.0,  1.0,
+     1.0,  1.0,  1.0,
+    -1.0,  1.0,  1.0,
+     -- Back face
+    -1.0, -1.0, -1.0,
+     1.0, -1.0, -1.0,
+     1.0,  1.0, -1.0,
+    -1.0,  1.0, -1.0
+	}
 	
 	-- Set clip to prevent drawing underlayers behind current layer
 	local clip_rect_x = max(cam.offset_x, 0)
