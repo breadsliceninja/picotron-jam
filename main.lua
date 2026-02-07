@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 06:47:11",revision=158]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 10:16:18",revision=164]]
 -- testing
 include "movement.lua"
 function _init()
@@ -24,10 +24,10 @@ function _init()
 	a = 0.3
 	-- animation
 	facing_sprites = {
-		up = 12,
-		down = 8,
-		left = 10,
-		right = 10,
+		up = 20,
+		down = 16,
+		left = 18,
+		right = 18,
 	}
 end
 

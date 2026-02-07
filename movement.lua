@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 06:47:13",revision=7]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 10:16:14",revision=12]]
 function move_player()
     START_SPEED = 1
 	-- left
@@ -9,9 +9,9 @@ function move_player()
 			not btn(3) 
 		)
 		then
-		p.sx = -START_SPEED 
+		p.vx = -START_SPEED 
 	elseif btnp(0) or btn(0) then
-		p.sx -= a
+		p.vx -= a
 		p.facing = "left"
 	end
 	-- right
@@ -22,9 +22,9 @@ function move_player()
 			not btn(3) 
 		)
 		then
-		p.sx = START_SPEED
+		p.vx = START_SPEED
 	elseif btnp(1) or btn(1) then
-		p.sx += a
+		p.vx += a
 		p.facing = "right"
 	end
 	-- up (if up and no other keys)
@@ -35,9 +35,9 @@ function move_player()
 			not btn(3) 
 		)
 		then
-		p.sy = -START_SPEED 
+		p.vy = -START_SPEED 
 	elseif btnp(2) or btn(2) then
-		p.sy -= a
+		p.vy -= a
 		p.facing = "up"
 	end
 	-- down
@@ -48,9 +48,9 @@ function move_player()
 			not btn(2) 
 		)
 		then
-		p.sy = START_SPEED 
+		p.vy = START_SPEED 
 	elseif btnp(3) or btn(3) then
-		p.sy += a
+		p.vy += a
 		p.facing = "down"
 	end
 	
@@ -60,8 +60,8 @@ function move_player()
 	end
 
 
-	p.sx *= 0.90
-	p.sy *= 0.90
+	p.vx *= 0.90
+	p.vy *= 0.90
 	-- if not moving left or right, deccel x axis
 --	if not (
 --		btn(0) or
@@ -76,7 +76,7 @@ function move_player()
 --	end
 	
 	
-	p.x += mid(-p.smax, p.sx, p.smax)
-	p.y += mid(-p.smax, p.sy, p.smax)
+	p.x += mid(-p.smax, p.vx, p.smax)
+	p.y += mid(-p.smax, p.vy, p.smax)
 
 end
