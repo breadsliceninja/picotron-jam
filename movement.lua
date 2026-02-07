@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 10:57:27",revision=394]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-07 23:26:49",revision=441]]
 include "math.lua"
 -- Handles Movement and Collision
 function move_player()
@@ -83,8 +83,8 @@ function move_player()
 			-- box collision
 			if p_right >= b_left_border and -- if going right 'into' the box
 				p.x <= b_left_border and  	 -- but currently to the left of the box
-				p.y + p.height >= b.y and 	 -- bottom of player lower than top of box
-				p.y <= (b.y + b.height) then -- top edge of player above bottom edge of box
+				p.y + p.height - p.y_offset >= b.y and 	 -- bottom of player lower than top of box
+				p.y + p.y_offset <= (b.y + b.height) then -- top edge of player above bottom edge of box
 				
 				b.x = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
 				p.x = b.x - b.width + p.x_offset 
@@ -100,13 +100,13 @@ function move_player()
 		if mget(p_left/16, (p.y+p.y_offset)/16) != 4 then
 			-- box collision
 
-			if proposed_x <= b_right_border and -- if proposed left is going to 'go into' the box
-				p.x >= b_right_border and -- but currently TO THE RIGHT of the box
-				p.y + p.height >= b.y and 	 -- bottom of player lower than top of box
-				p.y <= (b.y + b.height) then -- top edge of player above bottom edge of box
+			if proposed_x + 4 <= (b_right_border) and -- if new right going INTO box
+				p.x >= b_right_border - 4 and          -- but currently to the right of box
+				p.y + p.height - p.y_offset >= b.y and 	 -- bottom of player lower than top of box
+				p.y <= (b.y + b.height) - p.y_offset then -- top edge of player above bottom edge of box
 --				 
 				b.x = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
-				p.x = b.x + b.width
+				p.x = b.x + b.width - 3
 			else
 				p.x = proposed_x
 			end
