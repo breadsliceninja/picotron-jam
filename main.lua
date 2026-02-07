@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 03:42:31",revision=125]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 04:19:28",revision=135]]
 -- testing
 include "movement.lua"
 function _init()
@@ -6,10 +6,14 @@ function _init()
 	p = {
 		x = 16*4,
 		y = 16*4,
-		sx = 0,
-		sy = 0,
-		smax = 3
+		vx = 0,
+		vy = 0,
+		smax = 3,
+		width = 32,
+		height = 32
 	}
+	-- collision blocks
+	c = {4,}
 	-- acceleration
 	a = 0.3
 end
