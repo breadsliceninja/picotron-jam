@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 06:10:30",revision=36]]
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:24:27",revision=302]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -6,7 +6,9 @@ include "box_detection.lua"
 
 function _init()
 	-- DEBUG
-	show_hbox = true
+	show_hbox = false
+	
+	show_menu = true
 	
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
@@ -117,6 +119,29 @@ function _init()
 	world.current_map = base_layer[1].bmp
 	world.previous_map = nil
 	world.next_map = next_layer[1].bmp
+	
+	local names = {
+		"Ollie Hogue",
+		"Matthew Jakeman",
+		"Bodhi Tuladhar"
+	}
+	local permutations = {
+		{1,2,3},
+		{1,3,2},
+		{2,1,3},
+		{2,3,1},
+		{3,2,1},
+		{3,1,2}
+	}
+	
+	math.randomseed()
+	local selection = permutations[math.ceil((math.random() * 100) % 6)]
+	name1 = names[selection[1]]
+	name2 = names[selection[2]]
+	name3 = names[selection[3]]
+	
+	menu_anim_counter = 0
+	menu_debounce_counter = 0
 end
 
 function calc_new_camera_bounds()	
@@ -146,6 +171,9 @@ function calc_new_camera_bounds()
 end
 
 function _update()
+	
+	if show_menu then return end
+
 	-- called each frame (60 times)
 	move_player()
 	detect_box_solve()
@@ -243,6 +271,123 @@ function _draw()
 	-- draw graphics teehee
 	-- each tile is 16x16
 	cls()
+	
+	if show_menu then
+		menu_anim_counter += 1
+		menu_debounce_counter += 1
+		
+		SCENE_1 = 1600
+		SCENE_1_CHECK_1 = 120
+		SCENE_1_CHECK_2 = 500
+		SCENE_1_CHECK_3 = 800
+		SCENE_2 = 2000
+		
+		if menu_anim_counter < SCENE_1 then
+			cls(21)
+			print("A small rabbit goes on a quest...", 160, 40, 7)
+			
+			rectfill(40, 60, screen_width - 40, 140, 0)
+			
+			if menu_anim_counter < SCENE_1_CHECK_1 then
+				local rabbit_sprite_idx = ((menu_anim_counter % 32) > 16) and 18 or 19
+				spr(rabbit_sprite_idx, 120, 90)
+			elseif menu_anim_counter > SCENE_1_CHECK_1 and menu_anim_counter < SCENE_1_CHECK_2 then
+				local rabbit_sprite_idx = ((menu_anim_counter % 32) > 16) and 16 or 17
+				spr(rabbit_sprite_idx, 120, 90)
+				
+				local fox_sprite_idx = ((menu_anim_counter % 64) > 32) and 22 or 23
+				spr(fox_sprite_idx, 340, 80, true)
+			elseif menu_anim_counter > SCENE_1_CHECK_2 then
+				
+				x_time = (menu_anim_counter - SCENE_1_CHECK_2)/(SCENE_1_CHECK_3 - SCENE_1_CHECK_2)
+				x_progress = math.lerp(0, 100, math.min(x_time, 1.0))
+				
+				local rabbit_sprite_idx = ((menu_anim_counter % 32) > 16) and 18 or 19
+				spr(rabbit_sprite_idx, 120 + x_progress, 90)
+				
+				local fox_sprite_idx = ((menu_anim_counter % 64) > 32) and 22 or 23
+				spr(fox_sprite_idx, 340, 80, true)
+				
+				spr(60, 160+100, 90)
+				
+				spr(56, 160 + x_progress, 90)
+				
+				if menu_anim_counter > SCENE_1_CHECK_3 then
+					spr(40, 260, 72)
+					
+					if menu_anim_counter > SCENE_1_CHECK_3 + 20 then
+						spr(4, 84, 60)
+						spr(5, 100, 60)
+						spr(6, 116, 60)
+						spr(4, 132, 60)
+					end
+					
+					if menu_anim_counter > SCENE_1_CHECK_3 + 40 then
+						spr(4, 84, 76)
+						spr(5, 100, 76)
+						spr(6, 116, 76)
+						spr(4, 132, 76)
+					end
+					
+					if menu_anim_counter > SCENE_1_CHECK_3 + 60 then
+						spr(4, 84, 92)
+						spr(5, 100, 92)
+						spr(6, 116, 92)
+						spr(4, 132, 92)
+					end
+					
+					if menu_anim_counter > SCENE_1_CHECK_3 + 80 then
+						spr(4, 132, 108)
+						spr(7, 116, 108)
+						spr(7, 100, 108)
+						spr(4, 84, 108)
+					end
+				end
+			end
+			
+			if menu_anim_counter > SCENE_1_CHECK_1 then
+				print("The young rabbit must evade terrifying foes...", 80, 160, 7)
+			end
+			
+			if menu_anim_counter > SCENE_1_CHECK_2 then
+				print("...pushing boxes to collect keys...", 160, 180, 7)
+			end
+			
+			if menu_anim_counter > SCENE_1_CHECK_3 then
+				print("...unlocking the treacherous way to the top", 220, 200, 7)
+			end
+		elseif menu_anim_counter > SCENE_1 then
+			print("Carrot Tower", 205, 40)
+			
+			if ((menu_anim_counter % 96) > 48) then
+				print("Press Space to Play", 190, 180)
+			end
+			print("Copyright (c) 2026 - "..name1..", "..name2..", "..name3, 80, 220)
+		end
+		
+		if key("space") and menu_debounce_counter > 10 then
+			if menu_anim_counter < SCENE_1_CHECK_1 then
+				menu_anim_counter = SCENE_1_CHECK_1
+				menu_debounce_counter = 0
+			elseif menu_anim_counter < SCENE_1_CHECK_2 then
+				menu_anim_counter = SCENE_1_CHECK_2
+				menu_debounce_counter = 0
+			elseif menu_anim_counter < SCENE_1_CHECK_3 then
+				menu_anim_counter = SCENE_1_CHECK_3
+				menu_debounce_counter = 0
+			elseif menu_anim_counter < SCENE_1 then
+				menu_anim_counter = SCENE_1
+				menu_debounce_counter = 0
+			elseif menu_anim_counter < SCENE_2 then
+				menu_anim_counter = SCENE_2
+				menu_debounce_counter = 0
+			else
+				show_menu = false
+			end	
+		end
+
+		return
+	end
 
 	
 	local cube_coords = {
