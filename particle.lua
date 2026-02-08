@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 04:17:04",revision=158]]
+--[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 04:22:48",revision=160]]
 MAX_PARTICLES = 1000
 
 function create_particle_config()

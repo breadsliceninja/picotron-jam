@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:21:03",revision=366]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:38:27",revision=379]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -15,7 +15,7 @@ SPRITE_UP = 24
 SPRITE_DOWN = 22
 
 FOV_SEARCHING = 135
-FOV_SPOTTED = 45
+FOV_SPOTTED = 5
 
 DIST_SEARCHING = 8*16
 DIST_SPOTTED = 16*16

@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 03:39:51",revision=56]]
+--[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 04:37:02",revision=62]]
 -- testing
 include "movement.lua"
 include "enemy.lua"
@@ -59,6 +59,7 @@ function _init()
 	}
 	
 	fox1 = create_fox(5*16, 5*16)
+	fox2 = create_fox(12*16, 12*16)
 	
 	screen_width = 480
 	screen_height = 270
@@ -123,6 +124,7 @@ function _update()
 	process_particles(p.particles)
 	
 	process_fox(fox1)
+	process_fox(fox2)
 end
 
 function math.lerp(a,b,t)
@@ -239,4 +241,5 @@ function _draw()
 	spr(p_sprite, cam.offset_x + p.x, cam.offset_y + p.y, p.facing == "left")
 	
 	draw_fox(fox1)
+	draw_fox(fox2)
 end
