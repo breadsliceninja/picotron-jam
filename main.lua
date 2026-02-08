@@ -12,8 +12,9 @@ function _init()
 		smax = 3,
 		width = 32,
 		height = 32,
-		x_offset = 4,
-		y_offset = 4
+		-- x and y offsets
+		x_off = 4,
+		y_off = 4
 	}
 	-- box
 	b = {
