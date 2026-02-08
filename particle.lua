@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 04:22:48",revision=160]]
+--[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 05:28:29",revision=178]]
 MAX_PARTICLES = 1000
 
 function create_particle_config()
@@ -46,7 +46,7 @@ function emit_particles(system, n, config)
 	end
 end
 
-function process_particles(system)
+function process_particles(system, is_collidable)
 	-- Clear Table
 	local new_index = 1
 	for i = 1, #system
@@ -63,6 +63,29 @@ function process_particles(system)
 		
 		particle.radius *= particle.size_decay
 		particle.radius = max(particle.radius, 1)
+		
+		-- Check Collision
+		if is_collidable then
+			-- player
+			local p_left = p.x + p.hbox.x
+			local p_right = p_left + p.hbox.w
+			local p_top = p.y + p.hbox.y
+			local p_bottom = p_top + p.hbox.h
+			
+			-- collider
+			local c_left = particle.x - particle.radius
+			local c_right = particle.x + particle.radius
+			local c_top = particle.y - particle.radius
+			local c_bottom = particle.y + particle.radius
+				
+			if p_left < c_right and
+				p_right > c_left and
+				p_top < c_bottom and
+				p_bottom > c_top then
+				hurt_player()
+				particle.lifespan = -1	
+			end
+		end
 		
 		if particle.lifespan > 0 then
 			system[new_index] = particle

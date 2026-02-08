@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:55:40",revision=384]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 05:46:08",revision=441]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -7,8 +7,7 @@
 FOX_IDLE = 0
 FOX_SPOTTED = 1
 FOX_TRACKING = 2
-FOX_CONFUSED = 3
-FOX_FIRE_PROJECTILE = 4
+FOX_DIZZY = 3
 
 SPRITE_SIDE = 23
 SPRITE_UP = 24
@@ -16,14 +15,17 @@ SPRITE_DOWN = 22
 
 FOV_SEARCHING = 135
 FOV_SPOTTED = 5
+FOV_DIZZY = 90
 
 DIST_SEARCHING = 8*16
 DIST_SPOTTED = 16*16
+DIST_DIZZY = 2*16
 
 ANIM_SPOTTED_DURATION = 10
 ANIM_LOSE_FOCUS_DURATION = 100
 ANIM_FIRE_PROJECTILE_DURATION = 30
 ANIM_FIRE_PROJECTILE_COOLDOWN = 200
+ANIM_DIZZY_COOLDOWN = 400
 
 BURST_SIZE = 20
 
@@ -31,6 +33,12 @@ function create_fox(x,y)
 	return {
 		x = x,
 		y = y,
+		hbox = {
+			x = 9,
+			y = 10,
+			w = 13,
+			h = 36,
+		},
 		view_current_angle = 0,
 		view_fov = FOV_SEARCHING,
 		view_distance = DIST_SEARCHING,
@@ -45,6 +53,32 @@ function create_fox(x,y)
 end
 
 function process_fox(fox)
+	
+	-- Player collision stun logic
+	-- player
+	local p_left = p.x + p.hbox.x
+	local p_right = p_left + p.hbox.w
+	local p_top = p.y + p.hbox.y
+	local p_bottom = p_top + p.hbox.h
+			
+	-- collider
+	local c_left = fox.x + fox.hbox.x
+	local c_right = c_left + fox.hbox.w
+	local c_top = fox.y + fox.hbox.y
+	local c_bottom = c_top + fox.hbox.h
+				
+	if p_left < c_right and
+		p_right > c_left and
+		p_top < c_bottom and
+		p_bottom > c_top then
+		if p.is_dashing then
+			fox.state = FOX_DIZZY
+			fox.time_counter = 0
+			p.vx *= -1
+			p.vy *= -1
+		end
+	end
+
 	if fox.state == FOX_IDLE then
 		fox.view_fov = FOV_SEARCHING
 		fox.view_distance = DIST_SEARCHING
@@ -65,6 +99,22 @@ function process_fox(fox)
 			fox.state = FOX_SPOTTED
 			fox.time_counter = 0
 			fox.proj_counter = 0
+		end
+	end
+	
+	if fox.state == FOX_DIZZY then
+		fox.time_counter += 1
+		
+		fox.view_fov = FOV_DIZZY
+		fox.view_distance = DIST_DIZZY
+		fox.view_current_angle += 6 * fox.view_rotate_speed
+		if fox.view_current_angle > 180 then
+			fox.view_current_angle -= 360
+		end
+		
+		if fox.time_counter > ANIM_DIZZY_COOLDOWN then
+			fox.time_counter = 0
+			fox.state = FOX_IDLE
 		end
 	end
 	
@@ -197,6 +247,10 @@ function draw_fox(fox)
 	
 	local line_col = (fox.state == FOX_TRACKING) and 8 or 7
 	
+	if fox.state == FOX_DIZZY then
+		line_col = 18
+	end
+	
 	if fox.state == FOX_TRACKING and fox.time_counter != 0 then
 		line_col = (fox.time_counter % 16 < 8) and 10 or 8
 	end
@@ -229,8 +283,19 @@ function draw_fox(fox)
 		spr(SPRITE_DOWN, cam.offset_x + fox.x, cam.offset_y + fox.y)
 	end
 	
+--	rect(
+--		cam.offset_x + fox.x + fox.hbox.x,
+--		cam.offset_y + fox.y + fox.hbox.y,
+--		cam.offset_x + fox.x + fox.hbox.x + fox.hbox.w,
+--		cam.offset_y + fox.y + fox.hbox.y + fox.hbox.h)
+	
 	if fox.state != FOX_IDLE then
-		if fox.proj_counter < 0 then
+		if fox.state == FOX_DIZZY then
+			print("?*?",
+				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
+				cam.offset_y + fox.y - 12,
+				18)
+		elseif fox.proj_counter < 0 then
 			print("Zzz",
 				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
 				cam.offset_y + fox.y - 12,
