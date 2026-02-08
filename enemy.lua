@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 06:12:51",revision=451]]
+--[[pod_format="raw",created="2026-02-08 07:39:18",modified="2026-02-08 07:39:34",revision=1]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -305,6 +305,10 @@ function draw_fox(fox)
 		else
 			print("!!",
 				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
+				cam.offset_y + fox.y - 12,
+				8)
+			print("!!",
+				cam.offset_x + fox.x + fox.sprite_x_offset - 4 + 1,
 				cam.offset_y + fox.y - 12,
 				8)
 		end

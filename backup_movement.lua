@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 04:48:43",revision=54]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 07:15:13",revision=57]]
 include "box_detection.lua"
 function move_player()
    START_SPEED = 1
@@ -136,12 +136,15 @@ function move_player()
 	p_up 		=  proposed_y + p.y_off
 	p_down 	= 	proposed_y - p.y_off + p.height
 
-	-- note: currently only supports one box (grimace emoji)
-	b_up_border 	= b.y
-	b_down_border 	= b.y + b.height
-	b_right_border 	= b.x + b.width
-	b_left_border 	= b.x
+	-- boxes_this_level = level_boxes[level]
+	b = level_boxes[1][1]
 	
+
+
+	-- note: currently only supports one box (grimace emoji)
+	
+
+
 	BOX_PUSH_SPEED = 1
 
 	-- if top of player edge is lower than top of box edge
@@ -151,22 +154,34 @@ function move_player()
 		-- if right edge is NOT hitting collision map block, move		
 		if not fget(mget((p_right)/16, (p.y+p.y_off)/16), 0) then
 			-- box collision
-			if p_right >= b_left_border and -- if going right 'into' the box
-				p.x < b_left_border and  	 -- but currently to the left of the box
-				p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
-				p.y + p.y_off < (b.y + b.height) then -- top edge of player above bottom edge of box
+			for i = 1,#level_boxes[level] do
+				b_up_border 	= b.y
+				b_down_border 	= b.y + b.height
+				b_right_border 	= b.x + b.width
+				b_left_border 	= b.x
+				b = level_boxes[level][i]
+
+				if 
+					p_right >= b_left_border and -- if going right 'into' the box
+					p.x < b_left_border and  	 -- but currently to the left of the box
+					p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
+					p.y + p.y_off < (b.y + b.height) -- top edge of player above bottom edge of box
+					then
 				
-				proposed_bx = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
-				on_track(proposed_bx, b.y)
-				if b.on_track == 1 then
-					b.x = proposed_bx
-					p.x = b.x - b.width + p.x_off 
-				end	
-		
-		
-			else
+					proposed_bx = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
+					on_track(proposed_bx, b.y)
+					if b.on_track == 1 then
+						b.x = proposed_bx
+						p.x = b.x - b.width + p.x_off 
+						p.push_box = true
+					else
+						p.push_box = false
+					end
+				end
+			end
+			
+			if p.push_box == false then
 				p.x = proposed_x
-				
 			end
 		else
 			p.x = ((math.floor(proposed_x/16))*16)+p.x_off 
@@ -178,19 +193,27 @@ function move_player()
 	if proposed_x < p.x then
 		if not fget(mget(p_left/16, (p.y+p.y_off)/16), 0) then
 			-- box collision
-			if proposed_x + p.x_off <= (b_right_border) and -- if new right going INTO box
-				p.x > b_right_border - p.x_off and          -- but currently to the right of box
-				p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
-				p.y < (b.y + b.height) - p.y_off then 
-				-- top edge of player above bottom edge of box
-				proposed_bx = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
-				on_track(proposed_bx, b.y)
-				if b.on_track == 1 then
-					b.x = proposed_bx
-					p.x = b.x + b.width 
+			for i = 1,#level_boxes[level] do
+				b_up_border 	= b.y
+				b_down_border 	= b.y + b.height
+				b_right_border 	= b.x + b.width
+				b_left_border 	= b.x
+				b = level_boxes[level][i]
+				
+				if proposed_x + p.x_off <= (b_right_border) and -- if new right going INTO box
+					p.x > b_right_border - p.x_off and          -- but currently to the right of box
+					p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
+					p.y < (b.y + b.height) - p.y_off then 
+					-- top edge of player above bottom edge of box
+					proposed_bx = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
+					on_track(proposed_bx, b.y)
+					if b.on_track == 1 then
+						b.x = proposed_bx
+						p.x = b.x + b.width 
+					end
+				else
+					p.x = proposed_x
 				end
-			else
-				p.x = proposed_x
 			end
 		else
 			p.x = ((math.ceil((proposed_x)/16))*16) - p.x_off
@@ -205,15 +228,22 @@ function move_player()
 				p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
 				p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
 				then
-				proposed_by = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
-				on_track(b.x, proposed_by)
-				if b.on_track == 1 then
-					b.y = proposed_by
-					p.y = b.y + b.height - (p.y_off-1)
-				end	
+				for i = 1,#level_boxes[level] do
+					b_up_border 	= b.y
+					b_down_border 	= b.y + b.height
+					b_right_border 	= b.x + b.width
+					b_left_border 	= b.x
+					b = level_boxes[level][i]
 				
-			else
-				p.y = proposed_y
+					proposed_by = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
+					on_track(b.x, proposed_by)
+					if b.on_track == 1 then
+						b.y = proposed_by
+						p.y = b.y + b.height - (p.y_off-1)
+					else
+						p.y = proposed_y
+					end
+				end
 			end
 		else
 			p.y = (math.ceil(proposed_y/16))*16 - p.y_off

@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:33:52",revision=327]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 07:43:55",revision=7]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -6,10 +6,9 @@ include "box_detection.lua"
 
 function _init()
 	-- DEBUG
-	show_hbox = false
-	
+	show_hbox = false	
 	show_menu = true
-	
+
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
 	anim_dly = 14 -- walk cycle speed
@@ -40,23 +39,15 @@ function _init()
 			y = 10,
 			w = 13,
 			h = 19,
-		}
-	}
-	-- box
-	b = {
-		x = 16*8,
-		y = 16*8,
-		width = 32,
-		height = 32,
-		-- solved is when the box is in the right place
-		-- 0 for false, 1 for true
-		solved = 0
+		},
+		push_box = false
 	}
 
 	-- collision blocks (TODO: use flags actually)
 	c = {4,}
 	-- acceleration
 	a = 0.3
+
 	
 	-- animation
 	facing_sprites = {
@@ -75,6 +66,8 @@ function _init()
 		target_offset_y = 0,
 	}
 	
+	level_solved = 0
+
 	-- world & stairs
 	world = {
 		do_stair_climb = false, -- are we currently climbing stairs
@@ -102,11 +95,61 @@ function _init()
 	fox6 = create_fox(9*16, 11*16)
 	-- Level 3
 	fox7 = create_fox(1*16, 2*16)
-	fox8 = create_fox(12*16, 12*16)
+	fox8 = create_fox(20*16, 12*16)
 	fox9 = create_fox(5*16, 5*16)
 	fox10 = create_fox(12*16, 12*16)
-	fox11 = create_fox(5*16, 5*16)
-	fox12 = create_fox(12*16, 12*16)
+	fox11 = create_fox(32*8, 5*16)
+	fox12 = create_fox(12*16, 20*16)
+	
+	-- Level 1
+	box1 = {
+		x = 16*8,
+		y = 16*8,
+		width = 32, height = 32,
+		solved = 0, on_track = 1
+	}
+
+	box2 = {
+		x = 16*8,
+		y = 16*10,
+		width = 32, height = 32,
+		solved = 0, on_track = 1
+	}
+	
+	box3 = {
+		x = 16*8,
+		y = 16*12,
+		width = 32, height = 32,
+		solved = 0, on_track = 1
+	}
+
+	box4 = {
+		x = 16*8,
+		y = 16*14,
+		width = 32, height = 32,
+		solved = 0, on_track = 1
+	}
+
+	level1_boxes = {}
+	table.insert(level1_boxes, box1)
+	
+	level2_boxes = {}
+	table.insert(level2_boxes, box2)
+	
+	level3_boxes = {}
+	table.insert(level3_boxes, box3)
+
+	level4_boxes = {}
+	table.insert(level3_boxes, box4)
+
+	level_boxes = {}
+	table.insert(level_boxes, level1_boxes)
+	table.insert(level_boxes, level2_boxes)
+	table.insert(level_boxes, level3_boxes)
+	table.insert(level_boxes, level4_boxes)
+	table.insert(level_boxes, level4_boxes)
+
+	b = box1
 	
 	screen_width = 480
 	screen_height = 270
@@ -179,6 +222,8 @@ function _update()
 	move_player()
 	detect_box_solve()
 	calc_new_camera_bounds()
+	all_boxes_solved()
+
 	
 	if p.anim_t > 0 then
 		p.anim_t -= 1
@@ -268,6 +313,16 @@ function draw_foxes()
 	end
 end
 
+function draw_box(box)
+	spr(56,cam.offset_x + box.x, cam.offset_y + box.y)
+end
+
+
+function draw_boxes()
+	for i = 1,#level_boxes[level] do
+		draw_box(level_boxes[level][i])
+	end
+end
 function _draw()
 	-- draw graphics teehee
 	-- each tile is 16x16
@@ -473,6 +528,7 @@ function _draw()
 			world.previous_previous_map = world.previous_map
 			world.previous_map = world.current_map
 			world.current_map = world.next_map
+
 			if level == 2 then
 				world.next_map = layer_after[1].bmp -- probably fix this at some point
 			elseif level == 3 then
@@ -480,6 +536,9 @@ function _draw()
 			else
 				world.next_map = nil
 			end
+
+			b = level_boxes[level][1]
+			b.solved=0
 			
 			-- Update camera offset
 			cam.offset_x += 0
@@ -540,10 +599,8 @@ function _draw()
 	end
 
 	-- TODO - fix box with levels 
-	spr(56,cam.offset_x + b.x, cam.offset_y + b.y)
-	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
-	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
-	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
-	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
+	print(box1.solved, 0+ cam.offset_x, 0 + cam.offset_y)
+	print(tostr(fget(7,0)), 0+ cam.offset_x, 0 + cam.offset_y+16)
+	draw_boxes()
 
 end
