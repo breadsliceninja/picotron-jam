@@ -1,6 +1,8 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-07 10:53:33",revision=1]]
+--[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 03:00:54",revision=21]]
 -- testing
 include "movement.lua"
+include "math.lua"
+include "box_detection.lua"
 function _init()
 	poke(0x5f5c, 255) -- diasable key repeat
 	anim_dly = 14
@@ -12,16 +14,29 @@ function _init()
 		smax = 3,
 		width = 32,
 		height = 32,
-		x_offset = 4,
-		y_offset = 4,
+		-- x and y offsets
+		x_off = 2,
+		y_off = 2,
 		facing = "down",
 		anim_t = anim_dly,
 		anim_alt = false,
 	}
-	-- collision blocks
+	-- box
+	b = {
+		x = 16*8,
+		y = 16*8,
+		width = 32,
+		height = 32,
+		-- solved is when the box is in the right place
+		-- 0 for false, 1 for true
+		solved = 0
+	}
+
+	-- collision blocks (TODO: use flags actually)
 	c = {4,}
 	-- acceleration
 	a = 0.3
+	
 	-- animation
 	facing_sprites = {
 		up = 20,
@@ -95,6 +110,7 @@ end
 function _update()
 	-- called each frame (60 times)
 	move_player()
+	detect_box_solve()
 	calc_new_camera_bounds()
 	
 	p.anim_t -= 1
@@ -116,6 +132,7 @@ function _draw()
 	-- draw graphics teehee
 	-- each tile is 16x16
 	cls()
+
 	
 	local cube_coords = {
 		--  Front face
@@ -214,4 +231,12 @@ function _draw()
 		p_sprite += 1
 	end
 	spr(p_sprite, cam.offset_x + p.x, cam.offset_y + p.y, p.facing == "left")
+	-- TODO - fix box with levels 
+	spr(56,cam.offset_x + b.x, cam.offset_y + b.y)
+	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
+	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
+	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
+	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
+
+
 end
