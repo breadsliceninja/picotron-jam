@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 08:42:05",revision=96]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:27:06",revision=137]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -86,20 +86,20 @@ function _init()
 	level = 1
 	
 	-- Level 1
-	fox1 = create_fox(22*16, 10*16)
-	fox2 = create_fox(23*16, 19*16)
+	fox1 = create_fox(22*16, 9*16)
+	fox2 = create_fox(23*16, 18*16)
 	-- Level 2
-	fox3 = create_fox(7*16, 3*16)
-	fox4 = create_fox(14*16, 14*16)
-	fox5 = create_fox(2*16, 1*16)
-	fox6 = create_fox(9*16, 11*16)
-	-- Level 3
+	fox3 = create_fox(21*16, 12*16)
+	fox4 = create_fox(16*16, 16*16)
+	fox5 = create_fox(5*16, 14*16)
+	fox6 = create_fox(6*16, 5*16)
 	fox7 = create_fox(1*16, 2*16)
-	fox8 = create_fox(20*16, 12*16)
-	fox9 = create_fox(5*16, 5*16)
-	fox10 = create_fox(12*16, 12*16)
-	fox11 = create_fox(32*8, 5*16)
-	fox12 = create_fox(12*16, 20*16)
+	-- Level 3
+	fox8 = create_fox(23*16, 13*16)
+	fox9 = create_fox(19*16, 9*16)
+	fox10 = create_fox(28*16, 3*16)
+	fox11 = create_fox(12*16, 0)
+	fox12 = create_fox(1*16, 0)
 	
 	-- Level 1
 	box1 = {
@@ -110,22 +110,22 @@ function _init()
 	}
 
 	box2 = {
-		x = 16*8,
-		y = 16*10,
+		x = 25*16,
+		y = 3*16,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
 	}
 	
 	box3 = {
-		x = 16*8,
-		y = 16*12,
+		x = 15*16,
+		y = 16*16,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
 	}
 
 	box4 = {
-		x = 16*8,
-		y = 16*14,
+		x = 16*32,
+		y = 16*32,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
 	}
@@ -140,13 +140,12 @@ function _init()
 	table.insert(level3_boxes, box3)
 
 	level4_boxes = {}
-	table.insert(level3_boxes, box4)
+	table.insert(level4_boxes, box4)
 
 	level_boxes = {}
 	table.insert(level_boxes, level1_boxes)
 	table.insert(level_boxes, level2_boxes)
 	table.insert(level_boxes, level3_boxes)
-	table.insert(level_boxes, level4_boxes)
 	table.insert(level_boxes, level4_boxes)
 
 	b = box1
@@ -266,11 +265,11 @@ function _update()
 		process_fox(fox4)
 		process_fox(fox5)
 		process_fox(fox6)
+		process_fox(fox7)
 	end
 	
 	-- Level 3
 	if level == 3 then
-		process_fox(fox7)
 		process_fox(fox8)
 		process_fox(fox9)
 		process_fox(fox10)
@@ -300,11 +299,11 @@ function draw_foxes()
 		draw_fox(fox4)
 		draw_fox(fox5)
 		draw_fox(fox6)
+		draw_fox(fox7)
 	end
 	
 	-- Level 3
 	if level == 3 then
-		draw_fox(fox7)
 		draw_fox(fox8)
 		draw_fox(fox9)
 		draw_fox(fox10)
@@ -470,20 +469,6 @@ function _draw()
 
 		return
 	end
-
-	
-	local cube_coords = {
-		--  Front face
-    -1.0, -1.0,  1.0,
-     1.0, -1.0,  1.0,
-     1.0,  1.0,  1.0,
-    -1.0,  1.0,  1.0,
-     -- Back face
-    -1.0, -1.0, -1.0,
-     1.0, -1.0, -1.0,
-     1.0,  1.0, -1.0,
-    -1.0,  1.0, -1.0
-	}
 	
 	-- Set clip to prevent drawing underlayers behind current layer
 	local clip_rect_x = cam.offset_x
@@ -564,8 +549,6 @@ function _draw()
 		map(0, 0, cam.offset_x, cam.offset_y)
 		draw_foxes()
 	end
-	
-	-- Render black borders for +5 outside the toplevel map
 	
 	-- Particles!!
 	draw_particles(p.particles)
