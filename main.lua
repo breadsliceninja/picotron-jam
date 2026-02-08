@@ -1,9 +1,16 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 10:16:18",revision=164]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-08 04:11:58",revision=252]]
 -- testing
 include "movement.lua"
 function _init()
+	-- DEBUG
+	show_hbox = false
+	
+	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
-	anim_dly = 14
+	anim_dly = 14 -- walk cycle speed
+	dash_dly = 24
+	dash_spd = 5
+	invul_dly = 90
 	p = {
 		x = 16*4,
 		y = 16*4,
@@ -17,6 +24,16 @@ function _init()
 		facing = "down",
 		anim_t = anim_dly,
 		anim_alt = false,
+		is_dashing = false,
+		dash_t = 0,
+		hp = 3,
+		invul_t = 0,
+		hbox = {
+			x = 9,
+			y = 10,
+			w = 13,
+			h = 19,
+		}
 	}
 	-- collision blocks
 	c = {4,}
@@ -87,10 +104,20 @@ function _update()
 	move_player()
 	calc_new_camera_bounds()
 	
-	p.anim_t -= 1
-	if p.anim_t <= 0 then
-		p.anim_alt = not p.anim_alt
-		p.anim_t = anim_dly
+	if p.anim_t > 0 then
+		p.anim_t -= 1
+		if p.anim_t <= 0 then
+			p.anim_alt = not p.anim_alt
+			p.anim_t = anim_dly
+		end
+	end
+	
+	if p.dash_t > 0 then
+		p.dash_t -= 1
+	end
+	
+	if p.invul_t > 0 then
+		p.invul_t -= 1
 	end
 end
 
@@ -166,12 +193,33 @@ function _draw()
 		world.do_stair_climb = true
 	end
 	
+	-- player animation
 	local p_sprite = facing_sprites[p.facing]
-	if (
-		p.anim_alt and 
-		(btn(0) or btn(1) or btn(2) or btn(3))
-	) then
-		p_sprite += 1
+	if (p.is_dashing) then
+		p_sprite = 25
+	else
+		-- set walk frame
+		if (
+			p.anim_alt and 
+			(btn(0) or btn(1) or btn(2) or btn(3))
+		) then
+			p_sprite += 1
+		end
+	end
+	if p.invul_t > 0 and p.invul_t % 30 < 8 then
+--		pal(14, 6) 
+		pal(21, 14)
 	end
 	spr(p_sprite, cam.offset_x + p.x, cam.offset_y + p.y, p.facing == "left")
+	pal()
+	
+	-- ui
+	print("HP: " .. p.hp, 10, 10, 7)
+	
+	-- debug
+	if show_hbox then
+		local x1 = p.x + p.hbox.x + cam.offset_x
+		local y1 = p.y + p.hbox.y + cam.offset_y
+		rect(x1, y1, x1 + p.hbox.w, y1 + p.hbox.h, 8)
+	end
 end
