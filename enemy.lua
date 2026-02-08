@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 03:40:17",revision=266]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:21:03",revision=366]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -22,6 +22,10 @@ DIST_SPOTTED = 16*16
 
 ANIM_SPOTTED_DURATION = 10
 ANIM_LOSE_FOCUS_DURATION = 100
+ANIM_FIRE_PROJECTILE_DURATION = 30
+ANIM_FIRE_PROJECTILE_COOLDOWN = 200
+
+BURST_SIZE = 20
 
 function create_fox(x,y)
 	return {
@@ -35,6 +39,8 @@ function create_fox(x,y)
 		sprite_y_offset = 38,
 		state = FOX_IDLE,
 		time_counter = 0,
+		projectile_counter = 0,
+		particle_system = {},
 	}
 end
 
@@ -58,6 +64,7 @@ function process_fox(fox)
 			dist_to_player < fox.view_distance then
 			fox.state = FOX_SPOTTED
 			fox.time_counter = 0
+			fox.proj_counter = 0
 		end
 	end
 	
@@ -79,6 +86,11 @@ function process_fox(fox)
 	if fox.state == FOX_TRACKING then
 		fox.view_fov = FOV_SPOTTED
 		fox.view_distance = DIST_SPOTTED
+		fox.proj_counter += 1
+		
+		if fox.proj_counter > (ANIM_FIRE_PROJECTILE_DURATION * BURST_SIZE) then
+			fox.proj_counter = -ANIM_FIRE_PROJECTILE_COOLDOWN
+		end
 		
 		fox.view_current_angle = calc_angle_to_player(fox)
 		
@@ -92,8 +104,42 @@ function process_fox(fox)
 			end
 		else
 			fox.time_counter = 0
+			
+			if fox.proj_counter > 0 and fox.proj_counter % ANIM_FIRE_PROJECTILE_DURATION == 0 then
+				local fox_center_x = fox.x + fox.sprite_x_offset
+				local fox_head_y = fox.y + 20
+		
+				local player_center_x = p.x + p.x_offset
+				local player_center_y = p.y + p.y_offset
+				
+				local dir_x = player_center_x - fox_center_x
+				local dir_y = player_center_y - fox_head_y
+				
+				local magnitude = sqrt(dir_x^2 + dir_y^2)
+				local norm_dir_x = dir_x / magnitude
+				local norm_dir_y = dir_y / magnitude
+				
+				local config = create_particle_config()
+				config.x = fox_center_x
+				config.y = fox_head_y
+				config.vx = 1 * norm_dir_x
+				config.vy = 1 * norm_dir_y
+				config.colour = 8
+				config.alt_colour = 9
+				config.colour_change_duration = 32
+				config.radius = 4
+				config.glow_radius = 5
+				config.glow_colour = 10
+				config.size_decay = 1.0
+				config.lifespan = 500
+				config.friction = 1.0
+				config.randomness = 0.2
+				emit_particles(fox.particle_system, 1, config)
+			end
 		end
 	end
+	
+	process_particles(fox.particle_system)
 end
 
 function calc_angle_to_player(fox)
@@ -155,6 +201,10 @@ function draw_fox(fox)
 		line_col = (fox.time_counter % 16 < 8) and 10 or 8
 	end
 	
+	if fox.state == FOX_TRACKING and fox.proj_counter < 0 then
+		line_col = 18
+	end
+	
 --	rectfill(rect_min_x, rect_min_y, rect_max_x, rect_max_y, 9)
 	clip(rect_min_x, rect_min_y, rect_max_x - rect_min_x, rect_max_y - rect_min_y)
 	
@@ -167,6 +217,8 @@ function draw_fox(fox)
 	line(center_x, center_y, triangle_x_upper, triangle_y_upper, line_col)
 	line(center_x, center_y, triangle_x_lower, triangle_y_lower, line_col)
 	
+	draw_particles(fox.particle_system)
+	
 	if fox.view_current_angle > 45 and fox.view_current_angle <= 135 then
 		spr(SPRITE_SIDE, cam.offset_x + fox.x, cam.offset_y + fox.y)
 	elseif fox.view_current_angle > 135 and fox.view_current_angle <= 225 then
@@ -178,9 +230,16 @@ function draw_fox(fox)
 	end
 	
 	if fox.state != FOX_IDLE then
-		print("!!",
-			cam.offset_x + fox.x + fox.sprite_x_offset - 4,
-			cam.offset_y + fox.y - 12,
-			8)
+		if fox.proj_counter < 0 then
+			print("Zzz",
+				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
+				cam.offset_y + fox.y - 12,
+				18)
+		else
+			print("!!",
+				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
+				cam.offset_y + fox.y - 12,
+				8)
+		end
 	end
 end
