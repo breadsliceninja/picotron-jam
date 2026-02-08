@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:24:27",revision=302]]
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:26:19",revision=306]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -278,7 +278,7 @@ function _draw()
 		
 		SCENE_1 = 1600
 		SCENE_1_CHECK_1 = 120
-		SCENE_1_CHECK_2 = 500
+		SCENE_1_CHECK_2 = 400
 		SCENE_1_CHECK_3 = 800
 		SCENE_2 = 2000
 		
@@ -354,7 +354,7 @@ function _draw()
 			end
 			
 			if menu_anim_counter > SCENE_1_CHECK_3 then
-				print("...unlocking the treacherous way to the top", 220, 200, 7)
+				print("...unlocking the treacherous way to the top.", 220, 200, 7)
 			end
 		elseif menu_anim_counter > SCENE_1 then
 			print("Carrot Tower", 205, 40)
