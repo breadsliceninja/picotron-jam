@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-07 07:36:10",revision=151]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-08 01:58:59",revision=185]]
 -- testing
 include "movement.lua"
 include "math.lua"
@@ -21,7 +21,10 @@ function _init()
 		x = 16*8,
 		y = 16*8,
 		width = 32,
-		height = 32
+		height = 32,
+		-- solved is when the box is in the right place
+		-- 0 for false, 1 for true
+		solved = 0
 	}
 	-- collision blocks
 	c = {4,}
@@ -45,8 +48,18 @@ function _draw()
 	print(math.floor(p.x), p.x, p.y-16)
 	print(math.floor(p.y), p.x+16, p.y-16)
 
-	spr(12,b.x, b.y)
+	spr(56,b.x, b.y)
 	print(math.floor(b.x), b.x, b.y-16)
 	print(math.floor(b.y), b.x+16, b.y-16)
 
+	if mget((b.x/16), (b.y/16)) == 60 then
+		b.solved = 1
+	end
+	print(tostr(mget((b.x/16), (b.y/16))), 30,30)
+	?b.x
+	?b.y
+	?mget(1,1)
+	?b.solved
+--	-- ?(b.solved==true)
+--	print(b.solved == true, 16, 16, 2)
 end
