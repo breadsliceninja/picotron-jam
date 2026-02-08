@@ -48,7 +48,8 @@ function _init()
 		height = 32,
 		-- solved is when the box is in the right place
 		-- 0 for false, 1 for true
-		solved = 0
+		solved = 0,
+		on_track = 1
 	}
 
 	-- collision blocks (TODO: use flags actually)
@@ -372,9 +373,9 @@ function _draw()
 
 	-- TODO - fix box with levels 
 	spr(56,cam.offset_x + b.x, cam.offset_y + b.y)
-	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
-	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
-	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
-	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
+--	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
+--	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
+--	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
+--	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
 
 end
