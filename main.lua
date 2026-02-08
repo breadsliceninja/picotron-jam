@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:24:52",revision=135]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:27:06",revision=137]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -124,8 +124,8 @@ function _init()
 	}
 
 	box4 = {
-		x = 16*8,
-		y = 16*14,
+		x = 16*32,
+		y = 16*32,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
 	}
