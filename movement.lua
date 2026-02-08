@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 04:48:43",revision=54]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 08:39:30",revision=56]]
 include "box_detection.lua"
 function move_player()
    START_SPEED = 1
@@ -118,10 +118,10 @@ function move_player()
 	local y1 = p.y + p.hbox.y
 	if 
 		p.invul_t <= 0 and (
-		fget(mget((x1 + p.hbox.w)/16, y1/16), 1) or
-		fget(mget(x1/16, y1/16), 1) or
-		fget(mget(x1/16, (y1 + p.hbox.h)/16), 1) or
-		fget(mget((x1 + p.hbox.w)/16, (y1 + p.hbox.h)/16), 1) --or
+		fget(mget((x1 + p.hbox.w)/16, y1/16), 3) or
+		fget(mget(x1/16, y1/16), 3) or
+		fget(mget(x1/16, (y1 + p.hbox.h)/16), 3) or
+		fget(mget((x1 + p.hbox.w)/16, (y1 + p.hbox.h)/16), 3) --or
 --		fget(mget((x1 + p.hbox.w/2)/16, (y1 + p.hbox.h/2)/16), 1)
 		)
 	then

@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 07:43:55",revision=7]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 08:42:05",revision=96]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -86,8 +86,8 @@ function _init()
 	level = 1
 	
 	-- Level 1
-	fox1 = create_fox(5*16, 5*16)
-	fox2 = create_fox(12*16, 12*16)
+	fox1 = create_fox(22*16, 10*16)
+	fox2 = create_fox(23*16, 19*16)
 	-- Level 2
 	fox3 = create_fox(7*16, 3*16)
 	fox4 = create_fox(14*16, 14*16)
@@ -103,8 +103,8 @@ function _init()
 	
 	-- Level 1
 	box1 = {
-		x = 16*8,
-		y = 16*8,
+		x = 22*16,
+		y = 4*16,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
 	}
@@ -381,6 +381,9 @@ function _draw()
 				spr(fox_sprite_idx, 340, 80, true)
 				
 				spr(60, 160+100, 90)
+				spr(60, 160+100+16, 90)
+				spr(60, 160+100, 90+16)
+				spr(60, 160+100+16, 90+16)
 				
 				spr(56, 160 + x_progress, 90)
 				
@@ -429,12 +432,19 @@ function _draw()
 				print("...unlocking the treacherous way to the top.", 220, 200, 7)
 			end
 		elseif menu_anim_counter > SCENE_1 then
-			print("Carrot Tower", 205, 40)
+			cls(18)
+			rectfill(204, 48, 204+64, 48+11, 25)
+			print("Carrot Tower", 206, 50, 7)
+			
+			local rabbit_sprite_idx = ((menu_anim_counter % 32) > 16) and 18 or 19
+			spr(rabbit_sprite_idx, 220, 110)
 			
 			if ((menu_anim_counter % 96) > 48) then
-				print("Press Space to Play", 190, 180)
+				rectfill(188, 178, 188+97, 178+11, 0)
+				print("Press Space to Play", 190, 180, 7)
 			end
-			print("Copyright (c) 2026 - "..name1..", "..name2..", "..name3, 80, 220)
+			rectfill(78, 218, 78+325, 218+11, 0)
+			print("Copyright (c) 2026 - "..name1..", "..name2..", "..name3, 80, 220, 7)
 		end
 		
 		if key("space") and menu_debounce_counter > 10 then
@@ -599,8 +609,10 @@ function _draw()
 	end
 
 	-- TODO - fix box with levels 
-	print(box1.solved, 0+ cam.offset_x, 0 + cam.offset_y)
-	print(tostr(fget(7,0)), 0+ cam.offset_x, 0 + cam.offset_y+16)
+	if show_hbox then
+		print(box1.solved, 0+ cam.offset_x, 0 + cam.offset_y)
+		print(tostr(fget(7,0)), 0+ cam.offset_x, 0 + cam.offset_y+16)
+	end
 	draw_boxes()
 
 end
