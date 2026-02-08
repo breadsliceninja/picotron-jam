@@ -1,7 +1,8 @@
---[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-08 01:58:59",revision=185]]
+--[[pod_format="raw",created="2024-03-24 00:48:06",modified="2026-02-08 02:16:33",revision=191]]
 -- testing
 include "movement.lua"
 include "math.lua"
+include "box_detection.lua"
 function _init()
 	poke(0x5f5c, 255) -- diasable key repeat
 	p = {
@@ -36,6 +37,7 @@ end
 function _update()
 	-- called each frame (60 times)
 	move_player()
+	detect_box_solve()
 	
 end
 
@@ -52,9 +54,7 @@ function _draw()
 	print(math.floor(b.x), b.x, b.y-16)
 	print(math.floor(b.y), b.x+16, b.y-16)
 
-	if mget((b.x/16), (b.y/16)) == 60 then
-		b.solved = 1
-	end
+	-- left, right, top down
 	print(tostr(mget((b.x/16), (b.y/16))), 30,30)
 	?b.x
 	?b.y

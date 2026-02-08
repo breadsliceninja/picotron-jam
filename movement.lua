@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 01:17:35",revision=537]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 02:27:09",revision=547]]
 include "math.lua"
 -- Handles Movement and Collision
 function move_player()
@@ -117,8 +117,8 @@ function move_player()
 	-- UP
 	if proposed_y < p.y then
 		if mget((p.x+p.x_off)/16, (p_up)/16) != 4 then
-			if proposed_y + p.y_off <= b_down_border and -- if new right going INTO box
-				p.y + p.height - (p.y_off-1) > b.y + b.height and						-- and player bottom edge above box top edge
+			if proposed_y + p.y_off < b.y + p.height and -- if new right going INTO box
+				p.y + p.y_off > b.y + b.height and						-- and player bottom edge above box top edge
 				p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
 				p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
 				then
