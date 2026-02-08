@@ -1,11 +1,9 @@
---[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-08 06:54:29",revision=112]]
+--[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-08 09:15:55",revision=116]]
 function all_boxes_solved()
-	if level == 1 then
-		if b.solved == 1 then
-			fset(7,0,false)
-		else
-			fset(7,0,true)
-		end
+	if b.solved == 1 then
+		fset(7,0,false)
+	else
+		fset(7,0,true)
 	end
 end
 
