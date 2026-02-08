@@ -156,40 +156,4 @@ function move_player()
 			p.y = ((math.floor(proposed_y/16))*16)+p.y_off
 		end
 	end
-	-- p.vx *= 0.90
-	-- p.vy *= 0.90
-	
-	-- proposed_x = p.x + mid(-p.smax, p.vx, p.smax)
-	-- proposed_y = p.y + mid(-p.smax, p.vy, p.smax)
-	-- left/right tile checking...
-	-- if proposed_x > p.x then
-	-- 	if mget((p.width + proposed_x)/16, p.y/16) != 4 then
-	-- 		p.x = proposed_x
-	-- 	else
-	-- 		p.x = (math.floor(proposed_x/16))*16
-	-- 	end
-	-- end
-	-- if proposed_x < p.x then
-	-- 	if mget(proposed_x/16, p.y/16) != 4 then
-	-- 		p.x = proposed_x
-	-- 	else
-	-- 		p.x = (math.ceil(proposed_x/16))*16
-	-- 	end
-	-- end
-	
-	-- if proposed_y <= p.y then
-	-- 	if mget(p.x/16, proposed_y/16) != 4 then
-	-- 		p.y = proposed_y
-	-- 	else
-	-- 		p.y = (math.ceil(proposed_y/16))*16
-	-- 	end
-	-- end
-	-- if proposed_y >= p.y then
-	-- 	if mget(p.x/16, (proposed_y+p.height)/16) != 4 then
-	-- 		p.y = proposed_y
-	-- 	else
-	-- 		p.y = (math.floor(proposed_y/16))*16
-	-- 	end
-	-- end
-
 end
