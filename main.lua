@@ -1,7 +1,9 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 04:34:55",revision=22]]
--- testing
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 04:55:57",revision=4]]
 include "movement.lua"
+include "enemy.lua"
+include "particle.lua"
 include "box_detection.lua"
+
 function _init()
 	-- DEBUG
 	show_hbox = false
@@ -26,6 +28,7 @@ function _init()
 		facing = "down",
 		anim_t = anim_dly,
 		anim_alt = false,
+		particles = {},
 		is_dashing = false,
 		dash_t = 0,
 		hp = 3,
@@ -84,6 +87,24 @@ function _init()
 			multiplier = 0.9,
 		}
 	}
+	
+	level = 1
+	
+	-- Level 1
+	fox1 = create_fox(5*16, 5*16)
+	fox2 = create_fox(12*16, 12*16)
+	-- Level 2
+	fox3 = create_fox(7*16, 3*16)
+	fox4 = create_fox(14*16, 14*16)
+	fox5 = create_fox(2*16, 1*16)
+	fox6 = create_fox(9*16, 11*16)
+	-- Level 3
+	fox7 = create_fox(1*16, 2*16)
+	fox8 = create_fox(12*16, 12*16)
+	fox9 = create_fox(5*16, 5*16)
+	fox10 = create_fox(12*16, 12*16)
+	fox11 = create_fox(5*16, 5*16)
+	fox12 = create_fox(12*16, 12*16)
 	
 	screen_width = 480
 	screen_height = 270
@@ -144,6 +165,43 @@ function _update()
 	if p.invul_t > 0 then
 		p.invul_t -= 1
 	end
+	
+	if math.abs(p.vx) > 0.1 or math.abs(p.vy) > 0.1 then
+		config = create_particle_config()
+		config.x = p.x + p.x_off + (p.width/2)
+		config.y = p.y + p.y_off + p.height - 4
+		config.vx = -p.vx
+		config.vy = -2
+		config.colour = 22
+		config.radius = 1
+		emit_particles(p.particles, 2, config)
+	end
+	
+	process_particles(p.particles)
+	
+	-- Level 1
+	if level == 1 then
+		process_fox(fox1)
+		process_fox(fox2)
+	end
+	
+	-- Level 2
+	if level == 2 then
+		process_fox(fox3)
+		process_fox(fox4)
+		process_fox(fox5)
+		process_fox(fox6)
+	end
+	
+	-- Level 3
+	if level == 3 then
+		process_fox(fox7)
+		process_fox(fox8)
+		process_fox(fox9)
+		process_fox(fox10)
+		process_fox(fox11)
+		process_fox(fox12)
+	end
 end
 
 function math.lerp(a,b,t)
@@ -152,6 +210,32 @@ end
 
 function math.clamp(n, low, high)
 	return math.min(math.max(n, low), high)
+end
+
+function draw_foxes()
+		-- Level 1
+	if level == 1 then
+		draw_fox(fox1)
+		draw_fox(fox2)
+	end
+	
+	-- Level 2
+	if level == 2 then
+		draw_fox(fox3)
+		draw_fox(fox4)
+		draw_fox(fox5)
+		draw_fox(fox6)
+	end
+	
+	-- Level 3
+	if level == 3 then
+		draw_fox(fox7)
+		draw_fox(fox8)
+		draw_fox(fox9)
+		draw_fox(fox10)
+		draw_fox(fox11)
+		draw_fox(fox12)
+	end
 end
 
 function _draw()
@@ -208,6 +292,8 @@ function _draw()
 		local old_layer_y_offset = math.lerp(0, overlap_scroll * world.parallax.multiplier, player_progress)
 		map(0, 0, cam.offset_x, cam.offset_y + old_layer_y_offset * 16)
 		
+		draw_foxes()
+		
 		if player_progress > 0.5 then
 			map(world.next_map, 0, 0,
 				cam.offset_x + 0,
@@ -224,6 +310,8 @@ function _draw()
 			world.current_map = world.next_map
 			world.next_map = layer_after[1].bmp -- probably fix this at some point
 			
+			level += 1
+			
 			-- Update camera offset
 			cam.offset_x += 0
 			cam.offset_y += 16 * overlap_scroll
@@ -236,10 +324,13 @@ function _draw()
 	else
 		-- Just render the map normally, no funny business
 		map(0, 0, cam.offset_x, cam.offset_y)
+		draw_foxes()
 	end
 	
 	-- Render black borders for +5 outside the toplevel map
 	
+	-- Particles!!
+	draw_particles(p.particles)
 	
 	-- Check if we are on stairs and initiate a climb
 	player_center = mget((p.x + (p.width/2))/16, (p.y + (p.height/2))/16);
