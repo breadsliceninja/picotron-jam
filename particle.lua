@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 05:28:29",revision=178]]
+--[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 06:13:20",revision=188]]
 MAX_PARTICLES = 1000
 
 function create_particle_config()
@@ -105,16 +105,25 @@ function draw_particles(system)
 		local use_alt_colour = (particle.lifespan % particle.colour_change_duration) < (particle.colour_change_duration / 2)
 		local colour = use_alt_colour and particle.colour or particle.alt_colour
 		
+		if show_hbox then
+			local c_left = particle.x - particle.radius
+			local c_right = particle.x + particle.radius
+			local c_top = particle.y - particle.radius
+			local c_bottom = particle.y + particle.radius
+			
+			rectfill(cam.offset_x + c_left, cam.offset_y + c_top, cam.offset_x + c_right, cam.offset_y + c_bottom)
+		end
+		
 		if particle.glow_radius > 0 then
 			circfill(
-				cam.offset_x + particle.x - particle.radius,
-				cam.offset_y + particle.y - particle.radius,
+				cam.offset_x + particle.x,
+				cam.offset_y + particle.y,
 				particle.glow_radius, particle.glow_colour)
 		end
 		
 		circfill(
-			cam.offset_x + particle.x - particle.radius,
-			cam.offset_y + particle.y - particle.radius,
+			cam.offset_x + particle.x,
+			cam.offset_y + particle.y,
 			particle.radius, colour)
 	end
 end

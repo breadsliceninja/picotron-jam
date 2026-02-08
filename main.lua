@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 05:17:22",revision=6]]
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 06:10:30",revision=36]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -6,7 +6,7 @@ include "box_detection.lua"
 
 function _init()
 	-- DEBUG
-	show_hbox = false
+	show_hbox = true
 	
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
@@ -112,6 +112,7 @@ function _init()
 	base_layer = fetch("map/0.map")
 	next_layer = fetch("map/1.map")
 	layer_after = fetch("map/2.map")
+	final_layer = fetch("map/3.map")
 	
 	world.current_map = base_layer[1].bmp
 	world.previous_map = nil
@@ -258,9 +259,9 @@ function _draw()
 	}
 	
 	-- Set clip to prevent drawing underlayers behind current layer
-	local clip_rect_x = max(cam.offset_x, 0)
-	local clip_rect_y = max(cam.offset_y, 0)
-	clip(clip_rect_x, clip_rect_y, screen_width, screen_height)
+	local clip_rect_x = cam.offset_x
+	local clip_rect_y = cam.offset_y
+	clip(clip_rect_x, clip_rect_y, world.current_map:width()*16, world.current_map:height()*16)
 	
 	-- Update camera
 	cam.offset_x = math.lerp(cam.offset_x, cam.target_offset_x, 0.5)
@@ -304,13 +305,19 @@ function _draw()
 			memmap(world.next_map, 0x100000)
 			world.do_stair_climb = false
 			
+			level += 1
+			
 			-- Update maps
 			world.previous_previous_map = world.previous_map
 			world.previous_map = world.current_map
 			world.current_map = world.next_map
-			world.next_map = layer_after[1].bmp -- probably fix this at some point
-			
-			level += 1
+			if level == 2 then
+				world.next_map = layer_after[1].bmp -- probably fix this at some point
+			elseif level == 3 then
+				world.next_map = final_layer[1].bmp
+			else
+				world.next_map = nil
+			end
 			
 			-- Update camera offset
 			cam.offset_x += 0
