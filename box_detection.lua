@@ -1,4 +1,14 @@
---[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-08 05:29:23",revision=69]]
+--[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-08 06:54:29",revision=112]]
+function all_boxes_solved()
+	if level == 1 then
+		if b.solved == 1 then
+			fset(7,0,false)
+		else
+			fset(7,0,true)
+		end
+	end
+end
+
 function detect_box_solve() 
 	corners = {
 		mget(b.x/16, b.y/16),
@@ -11,7 +21,7 @@ function detect_box_solve()
 		fget(corners[2],2) and
 		fget(corners[3],2) and
 		fget(corners[4],2) then
-			b.solved = 123
+			b.solved = 1
 	end
 	
 end
