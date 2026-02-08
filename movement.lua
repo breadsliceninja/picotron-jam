@@ -1,4 +1,5 @@
---[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 03:07:04",revision=19]]
+--[[pod_format="raw",created="2026-02-07 02:41:15",modified="2026-02-08 04:48:43",revision=54]]
+include "box_detection.lua"
 function move_player()
    START_SPEED = 1
 	-- left
@@ -93,10 +94,17 @@ function move_player()
 				p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
 				p.y + p.y_off < (b.y + b.height) then -- top edge of player above bottom edge of box
 				
-				b.x = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
-				p.x = b.x - b.width + p.x_off 
+				proposed_bx = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
+				on_track(proposed_bx, b.y)
+				if b.on_track == 1 then
+					b.x = proposed_bx
+					p.x = b.x - b.width + p.x_off 
+				end	
+		
+		
 			else
 				p.x = proposed_x
+				
 			end
 		else
 			p.x = ((math.floor(proposed_x/16))*16)+p.x_off 
@@ -111,9 +119,12 @@ function move_player()
 				p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
 				p.y < (b.y + b.height) - p.y_off then 
 				-- top edge of player above bottom edge of box
---				 
-				b.x = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
-				p.x = b.x + b.width - (p.x_off+1) + 2
+				proposed_bx = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
+				on_track(proposed_bx, b.y)
+				if b.on_track == 1 then
+					b.x = proposed_bx
+					p.x = b.x + b.width 
+				end
 			else
 				p.x = proposed_x
 			end
@@ -129,8 +140,13 @@ function move_player()
 				p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
 				p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
 				then
-				b.y = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
-				p.y = b.y + b.height - (p.y_off-1)
+				proposed_by = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
+				on_track(b.x, proposed_by)
+				if b.on_track == 1 then
+					b.y = proposed_by
+					p.y = b.y + b.height - (p.y_off-1)
+				end	
+				
 			else
 				p.y = proposed_y
 			end
@@ -147,8 +163,15 @@ function move_player()
 				p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
 				p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
 				then
-				b.y = b.y + min(mid(-p.smax, p.vy, p.smax), BOX_PUSH_SPEED)
-				p.y = b.y - b.height + (p.y_off-1)
+				
+				proposed_by = b.y + min(mid(-p.smax, p.vy, p.smax), BOX_PUSH_SPEED)
+				on_track(b.x, proposed_by)
+				if b.on_track == 1 then
+					b.y = proposed_by
+					p.y = b.y - b.height + (p.y_off-1)
+				end		
+		
+				
 			else
 				p.y = proposed_y
 			end

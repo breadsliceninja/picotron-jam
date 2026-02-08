@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 03:00:54",revision=21]]
+--[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 05:22:56",revision=59]]
 -- testing
 include "movement.lua"
 include "math.lua"
@@ -29,7 +29,8 @@ function _init()
 		height = 32,
 		-- solved is when the box is in the right place
 		-- 0 for false, 1 for true
-		solved = 0
+		solved = 0,
+		on_track = 1
 	}
 
 	-- collision blocks (TODO: use flags actually)
@@ -233,10 +234,29 @@ function _draw()
 	spr(p_sprite, cam.offset_x + p.x, cam.offset_y + p.y, p.facing == "left")
 	-- TODO - fix box with levels 
 	spr(56,cam.offset_x + b.x, cam.offset_y + b.y)
-	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
-	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
-	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
-	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
+--	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
+--	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
+--	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
+--	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
 
+	-- top left
+
+	corners = {
+		mget(b.x/16, b.y/16),
+		mget(((b.x+b.width-1)/16), (b.y/16)),
+		mget((b.x/16), ((b.y+b.height-1)/16)),
+		mget(((b.x+b.width-1)/16), ((b.y+b.height-1)/16)),
+	}	
+
+	print(tostr(corners[1]),				cam.offset_x + 16,cam.offset_y + 0)
+	-- top right
+	print(tostr(corners[2]),	cam.offset_x + 16,cam.offset_y + 16)
+	-- bottom left
+	print(tostr(corners[3]),				cam.offset_x + 16,cam.offset_y + 32)
+	-- bottom right
+	print(tostr(corners[4]),cam.offset_x + 16,cam.offset_y + 48)
+	print(tostr(b.on_track),cam.offset_x + 16,cam.offset_y + 64)
+	print(tostr(b.solved),cam.offset_x + 16,cam.offset_y + 80)
+	
 
 end
