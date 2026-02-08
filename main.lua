@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 07:43:55",revision=7]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 08:38:05",revision=9]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -86,8 +86,8 @@ function _init()
 	level = 1
 	
 	-- Level 1
-	fox1 = create_fox(5*16, 5*16)
-	fox2 = create_fox(12*16, 12*16)
+	fox1 = create_fox(24*16, 10*16)
+	fox2 = create_fox(12*16, 26*16)
 	-- Level 2
 	fox3 = create_fox(7*16, 3*16)
 	fox4 = create_fox(14*16, 14*16)
@@ -103,8 +103,8 @@ function _init()
 	
 	-- Level 1
 	box1 = {
-		x = 16*8,
-		y = 16*8,
+		x = 16*10,
+		y = 16*4,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
 	}
@@ -130,6 +130,13 @@ function _init()
 		solved = 0, on_track = 1
 	}
 
+	box5= {
+		x = 16*8,
+		y = 16*14,
+		width = 32, height = 32,
+		solved = 0, on_track = 1
+	}
+
 	level1_boxes = {}
 	table.insert(level1_boxes, box1)
 	
@@ -140,14 +147,17 @@ function _init()
 	table.insert(level3_boxes, box3)
 
 	level4_boxes = {}
-	table.insert(level3_boxes, box4)
+	table.insert(level4_boxes, box4)
+
+	level5_boxes = {}
+	table.insert(level5_boxes, box5)
 
 	level_boxes = {}
 	table.insert(level_boxes, level1_boxes)
 	table.insert(level_boxes, level2_boxes)
 	table.insert(level_boxes, level3_boxes)
 	table.insert(level_boxes, level4_boxes)
-	table.insert(level_boxes, level4_boxes)
+	table.insert(level_boxes, level5_boxes)
 
 	b = box1
 	
