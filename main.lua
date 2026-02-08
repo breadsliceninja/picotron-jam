@@ -1,12 +1,19 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 04:45:55",revision=86]]
--- testing
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 04:55:57",revision=4]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
+include "box_detection.lua"
 
 function _init()
+	-- DEBUG
+	show_hbox = false
+	
+	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
-	anim_dly = 14
+	anim_dly = 14 -- walk cycle speed
+	dash_dly = 24
+	dash_spd = 5
+	invul_dly = 90
 	p = {
 		x = 16*4,
 		y = 16*4,
@@ -15,17 +22,40 @@ function _init()
 		smax = 3,
 		width = 32,
 		height = 32,
-		x_offset = 4,
-		y_offset = 4,
+		-- x and y offsets
+		x_off = 2,
+		y_off = 2,
 		facing = "down",
 		anim_t = anim_dly,
 		anim_alt = false,
-		particles = {}
+		particles = {},
+		is_dashing = false,
+		dash_t = 0,
+		hp = 3,
+		invul_t = 0,
+		hbox = {
+			x = 9,
+			y = 10,
+			w = 13,
+			h = 19,
+		}
 	}
-	-- collision blocks
+	-- box
+	b = {
+		x = 16*8,
+		y = 16*8,
+		width = 32,
+		height = 32,
+		-- solved is when the box is in the right place
+		-- 0 for false, 1 for true
+		solved = 0
+	}
+
+	-- collision blocks (TODO: use flags actually)
 	c = {4,}
 	-- acceleration
 	a = 0.3
+	
 	-- animation
 	facing_sprites = {
 		up = 20,
@@ -117,18 +147,29 @@ end
 function _update()
 	-- called each frame (60 times)
 	move_player()
+	detect_box_solve()
 	calc_new_camera_bounds()
 	
-	p.anim_t -= 1
-	if p.anim_t <= 0 then
-		p.anim_alt = not p.anim_alt
-		p.anim_t = anim_dly
+	if p.anim_t > 0 then
+		p.anim_t -= 1
+		if p.anim_t <= 0 then
+			p.anim_alt = not p.anim_alt
+			p.anim_t = anim_dly
+		end
+	end
+	
+	if p.dash_t > 0 then
+		p.dash_t -= 1
+	end
+	
+	if p.invul_t > 0 then
+		p.invul_t -= 1
 	end
 	
 	if math.abs(p.vx) > 0.1 or math.abs(p.vy) > 0.1 then
 		config = create_particle_config()
-		config.x = p.x + p.x_offset + (p.width/2)
-		config.y = p.y + p.y_offset + p.height - 4
+		config.x = p.x + p.x_off + (p.width/2)
+		config.y = p.y + p.y_off + p.height - 4
 		config.vx = -p.vx
 		config.vy = -2
 		config.colour = 22
@@ -201,6 +242,7 @@ function _draw()
 	-- draw graphics teehee
 	-- each tile is 16x16
 	cls()
+
 	
 	local cube_coords = {
 		--  Front face
@@ -298,12 +340,41 @@ function _draw()
 		world.stair_climb_end_y = world.stair_climb_start_y - 4
 	end
 	
+	-- player animation
 	local p_sprite = facing_sprites[p.facing]
-	if (
-		p.anim_alt and 
-		(btn(0) or btn(1) or btn(2) or btn(3))
-	) then
-		p_sprite += 1
+	if (p.is_dashing) then
+		p_sprite = 25
+	else
+		-- set walk frame
+		if (
+			p.anim_alt and 
+			(btn(0) or btn(1) or btn(2) or btn(3))
+		) then
+			p_sprite += 1
+		end
+	end
+	if p.invul_t > 0 and p.invul_t % 30 < 8 then
+--		pal(14, 6) 
+		pal(21, 14)
 	end
 	spr(p_sprite, cam.offset_x + p.x, cam.offset_y + p.y, p.facing == "left")
+	pal()
+	
+	-- ui
+	print("HP: " .. p.hp, 10, 10, 7)
+	
+	-- debug
+	if show_hbox then
+		local x1 = p.x + p.hbox.x + cam.offset_x
+		local y1 = p.y + p.hbox.y + cam.offset_y
+		rect(x1, y1, x1 + p.hbox.w, y1 + p.hbox.h, 8)
+	end
+
+	-- TODO - fix box with levels 
+	spr(56,cam.offset_x + b.x, cam.offset_y + b.y)
+	print(b.x,cam.offset_x + 0,cam.offset_y + 0)
+	print(b.x+b.width,cam.offset_x + 0,cam.offset_y + 16)
+	print(b.y,cam.offset_x + 0,cam.offset_y + 32)
+	print(b.y+b.height,cam.offset_x + 0,cam.offset_y + 48)
+
 end

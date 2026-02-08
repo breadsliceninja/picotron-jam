@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:39:52",revision=381]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:55:40",revision=384]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -109,8 +109,8 @@ function process_fox(fox)
 				local fox_center_x = fox.x + fox.sprite_x_offset
 				local fox_head_y = fox.y + 20
 		
-				local player_center_x = p.x + p.x_offset
-				local player_center_y = p.y + p.y_offset
+				local player_center_x = p.x + p.x_off
+				local player_center_y = p.y + p.y_off
 				
 				local dir_x = player_center_x - fox_center_x
 				local dir_y = player_center_y - fox_head_y
@@ -146,8 +146,8 @@ function calc_angle_to_player(fox)
 	local fox_center_x = fox.x + fox.sprite_x_offset
 	local fox_center_y = fox.y + fox.sprite_y_offset
 		
-	local player_center_x = p.x + p.x_offset
-	local player_center_y = p.y + p.y_offset
+	local player_center_x = p.x + p.x_off
+	local player_center_y = p.y + p.y_off
 		
 	local y_offset = fox_center_y - player_center_y
 	local x_offset = fox_center_x - player_center_x
@@ -159,8 +159,8 @@ function calc_distance_to_player(fox)
 	local fox_center_x = fox.x + fox.sprite_x_offset
 	local fox_center_y = fox.y + fox.sprite_y_offset
 		
-	local player_center_x = p.x + p.x_offset
-	local player_center_y = p.y + p.y_offset
+	local player_center_x = p.x + p.x_off
+	local player_center_y = p.y + p.y_off
 		
 	return sqrt((fox_center_x - player_center_x) ^ 2 + (fox_center_y - player_center_y) ^ 2)
 end
