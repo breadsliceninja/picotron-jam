@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:26:19",revision=306]]
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:33:52",revision=327]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -142,6 +142,7 @@ function _init()
 	
 	menu_anim_counter = 0
 	menu_debounce_counter = 0
+	menu_particles = {}
 end
 
 function calc_new_camera_bounds()	
@@ -279,7 +280,7 @@ function _draw()
 		SCENE_1 = 1600
 		SCENE_1_CHECK_1 = 120
 		SCENE_1_CHECK_2 = 400
-		SCENE_1_CHECK_3 = 800
+		SCENE_1_CHECK_3 = 700
 		SCENE_2 = 2000
 		
 		if menu_anim_counter < SCENE_1 then
@@ -301,6 +302,22 @@ function _draw()
 				
 				x_time = (menu_anim_counter - SCENE_1_CHECK_2)/(SCENE_1_CHECK_3 - SCENE_1_CHECK_2)
 				x_progress = math.lerp(0, 100, math.min(x_time, 1.0))
+				
+				if menu_anim_counter < SCENE_1_CHECK_3 then
+					config = create_particle_config()
+					config.x = 120 + x_progress + 8
+					config.y = 90 + p.y_off + p.height - 4
+					config.vx = -4
+					config.vy = -1
+					config.colour = 21
+					config.radius = 1
+					if ((menu_anim_counter % 4) > 2) then
+						emit_particles(menu_particles, 1, config)
+					end
+				end
+				
+				process_particles(menu_particles)
+				draw_particles(menu_particles)
 				
 				local rabbit_sprite_idx = ((menu_anim_counter % 32) > 16) and 18 or 19
 				spr(rabbit_sprite_idx, 120 + x_progress, 90)
