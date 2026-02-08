@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:38:27",revision=379]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:39:52",revision=381]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
