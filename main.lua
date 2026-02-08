@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 04:55:57",revision=4]]
+--[[pod_format="raw",created="2026-02-08 04:54:22",modified="2026-02-08 07:13:20",revision=8]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -101,11 +101,11 @@ function _init()
 	fox6 = create_fox(9*16, 11*16)
 	-- Level 3
 	fox7 = create_fox(1*16, 2*16)
-	fox8 = create_fox(12*16, 12*16)
+	fox8 = create_fox(20*16, 12*16)
 	fox9 = create_fox(5*16, 5*16)
 	fox10 = create_fox(12*16, 12*16)
-	fox11 = create_fox(5*16, 5*16)
-	fox12 = create_fox(12*16, 12*16)
+	fox11 = create_fox(32*8, 5*16)
+	fox12 = create_fox(12*16, 20*16)
 	
 	screen_width = 480
 	screen_height = 270
