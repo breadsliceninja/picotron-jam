@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:17:54",revision=132]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:24:52",revision=135]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -140,13 +140,12 @@ function _init()
 	table.insert(level3_boxes, box3)
 
 	level4_boxes = {}
-	table.insert(level3_boxes, box4)
+	table.insert(level4_boxes, box4)
 
 	level_boxes = {}
 	table.insert(level_boxes, level1_boxes)
 	table.insert(level_boxes, level2_boxes)
 	table.insert(level_boxes, level3_boxes)
-	table.insert(level_boxes, level4_boxes)
 	table.insert(level_boxes, level4_boxes)
 
 	b = box1
@@ -534,9 +533,7 @@ function _draw()
 			end
 
 			b = level_boxes[level][1]
-			if b then
-				b.solved=0
-			end
+			b.solved=0
 			
 			-- Update camera offset
 			cam.offset_x += 0
