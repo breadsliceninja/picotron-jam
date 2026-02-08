@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 04:55:40",revision=384]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 06:46:25",revision=389]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -146,8 +146,8 @@ function calc_angle_to_player(fox)
 	local fox_center_x = fox.x + fox.sprite_x_offset
 	local fox_center_y = fox.y + fox.sprite_y_offset
 		
-	local player_center_x = p.x + p.x_off
-	local player_center_y = p.y + p.y_off
+	local player_center_x = p.x + 16
+	local player_center_y = p.y + 16
 		
 	local y_offset = fox_center_y - player_center_y
 	local x_offset = fox_center_x - player_center_x
@@ -238,6 +238,10 @@ function draw_fox(fox)
 		else
 			print("!!",
 				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
+				cam.offset_y + fox.y - 12,
+				8)
+			print("!!",
+				cam.offset_x + fox.x + fox.sprite_x_offset - 4 + 1,
 				cam.offset_y + fox.y - 12,
 				8)
 		end
