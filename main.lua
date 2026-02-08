@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 08:38:05",revision=9]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:08:42",revision=27]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -84,10 +84,11 @@ function _init()
 	}
 	
 	level = 1
+	-- edit ....
 	
 	-- Level 1
-	fox1 = create_fox(24*16, 10*16)
-	fox2 = create_fox(12*16, 26*16)
+	fox1 = create_fox(20*16, 22*16)
+	fox2 = create_fox(8 *16, 20*16)
 	-- Level 2
 	fox3 = create_fox(7*16, 3*16)
 	fox4 = create_fox(14*16, 14*16)
@@ -103,7 +104,7 @@ function _init()
 	
 	-- Level 1
 	box1 = {
-		x = 16*10,
+		x = 16*8,
 		y = 16*4,
 		width = 32, height = 32,
 		solved = 0, on_track = 1
