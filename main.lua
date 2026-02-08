@@ -1,6 +1,8 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-07 10:53:33",revision=1]]
+--[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 00:50:09",revision=16]]
 -- testing
 include "movement.lua"
+include "enemy.lua"
+
 function _init()
 	poke(0x5f5c, 255) -- diasable key repeat
 	anim_dly = 14
@@ -54,6 +56,8 @@ function _init()
 		}
 	}
 	
+	fox1 = create_fox(5*16, 5*16)
+	
 	screen_width = 480
 	screen_height = 270
 	
@@ -102,6 +106,8 @@ function _update()
 		p.anim_alt = not p.anim_alt
 		p.anim_t = anim_dly
 	end
+	
+	process_fox(fox1)
 end
 
 function math.lerp(a,b,t)
@@ -214,4 +220,6 @@ function _draw()
 		p_sprite += 1
 	end
 	spr(p_sprite, cam.offset_x + p.x, cam.offset_y + p.y, p.facing == "left")
+	
+	draw_fox(fox1)
 end
