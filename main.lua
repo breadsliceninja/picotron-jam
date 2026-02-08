@@ -1,7 +1,8 @@
---[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 00:50:09",revision=16]]
+--[[pod_format="raw",created="2026-02-07 10:53:25",modified="2026-02-08 03:39:51",revision=56]]
 -- testing
 include "movement.lua"
 include "enemy.lua"
+include "particle.lua"
 
 function _init()
 	poke(0x5f5c, 255) -- diasable key repeat
@@ -19,6 +20,7 @@ function _init()
 		facing = "down",
 		anim_t = anim_dly,
 		anim_alt = false,
+		particles = {}
 	}
 	-- collision blocks
 	c = {4,}
@@ -106,6 +108,19 @@ function _update()
 		p.anim_alt = not p.anim_alt
 		p.anim_t = anim_dly
 	end
+	
+	if math.abs(p.vx) > 0.1 or math.abs(p.vy) > 0.1 then
+		config = create_particle_config()
+		config.x = p.x + p.x_offset + (p.width/2)
+		config.y = p.y + p.y_offset + p.height - 4
+		config.vx = -p.vx
+		config.vy = -2
+		config.colour = 22
+		config.radius = 1
+		emit_particles(p.particles, 2, config)
+	end
+	
+	process_particles(p.particles)
 	
 	process_fox(fox1)
 end
@@ -203,6 +218,8 @@ function _draw()
 	
 	-- Render black borders for +5 outside the toplevel map
 	
+	-- Particles!!
+	draw_particles(p.particles)
 	
 	-- Check if we are on stairs and initiate a climb
 	player_center = mget((p.x + (p.width/2))/16, (p.y + (p.height/2))/16);

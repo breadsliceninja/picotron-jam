@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 02:42:11",revision=251]]
+--[[pod_format="raw",created="2026-02-08 00:37:43",modified="2026-02-08 03:40:17",revision=266]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -21,6 +21,7 @@ DIST_SEARCHING = 8*16
 DIST_SPOTTED = 16*16
 
 ANIM_SPOTTED_DURATION = 10
+ANIM_LOSE_FOCUS_DURATION = 100
 
 function create_fox(x,y)
 	return {
@@ -80,6 +81,18 @@ function process_fox(fox)
 		fox.view_distance = DIST_SPOTTED
 		
 		fox.view_current_angle = calc_angle_to_player(fox)
+		
+		local distance_to_player = calc_distance_to_player(fox)
+		if distance_to_player > DIST_SPOTTED then
+			fox.time_counter += 1
+			
+			if fox.time_counter > ANIM_LOSE_FOCUS_DURATION then
+				fox.state = FOX_IDLE
+				fox.time_counter = 0
+			end
+		else
+			fox.time_counter = 0
+		end
 	end
 end
 
@@ -137,6 +150,10 @@ function draw_fox(fox)
 	local rect_max_y = max(max(triangle_y_upper, triangle_y_lower), diagonal_y_extent)
 	
 	local line_col = (fox.state == FOX_TRACKING) and 8 or 7
+	
+	if fox.state == FOX_TRACKING and fox.time_counter != 0 then
+		line_col = (fox.time_counter % 16 < 8) and 10 or 8
+	end
 	
 --	rectfill(rect_min_x, rect_min_y, rect_max_x, rect_max_y, 9)
 	clip(rect_min_x, rect_min_y, rect_max_x - rect_min_x, rect_max_y - rect_min_y)
