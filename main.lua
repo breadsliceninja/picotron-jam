@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:27:06",revision=137]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-09 12:01:57",revision=181]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -159,9 +159,9 @@ function _init()
 	layer_after = fetch("map/2.map")
 	final_layer = fetch("map/3.map")
 	
-	world.current_map = base_layer[1].bmp
+	world.current_map = base_layer
 	world.previous_map = nil
-	world.next_map = next_layer[1].bmp
+	world.next_map = next_layer
 	
 	local names = {
 		"Ollie Hogue",
@@ -315,6 +315,9 @@ end
 
 function draw_box(box)
 	spr(56,cam.offset_x + box.x, cam.offset_y + box.y)
+	if b.solved == 1 then
+		spr(40, cam.offset_x + box.x + 8, cam.offset_y + box.y - 20)
+	end
 end
 
 
@@ -474,20 +477,20 @@ function _draw()
 	-- Set clip to prevent drawing underlayers behind current layer
 	local clip_rect_x = cam.offset_x
 	local clip_rect_y = cam.offset_y
-	clip(clip_rect_x, clip_rect_y, world.current_map:width()*16, world.current_map:height()*16)
+	clip(clip_rect_x, clip_rect_y, world.current_map[1].bmp:width()*16, world.current_map[1].bmp:height()*16)
 	
 	-- Update camera
 	cam.offset_x = math.lerp(cam.offset_x, cam.target_offset_x, 0.5)
 	cam.offset_y = math.lerp(cam.offset_y, cam.target_offset_y, 0.5)
 	
 	if world.previous_previous_map then
-		map(world.previous_previous_map, 0, 0,
+		map(world.previous_previous_map[1].bmp, 0, 0,
 			cam.offset_x * world.parallax.multiplier ^ 2,
 			cam.offset_y * world.parallax.multiplier ^ 2)
 	end
 	
 	if world.previous_map then
-		map(world.previous_map, 0, 0,
+		map(world.previous_map[1].bmp, 0, 0,
 			cam.offset_x * world.parallax.multiplier,
 			cam.offset_y * world.parallax.multiplier)
 	end
@@ -505,17 +508,20 @@ function _draw()
 		local new_layer_y_offset = math.lerp(0, overlap_scroll, player_progress)
 		local old_layer_y_offset = math.lerp(0, overlap_scroll * world.parallax.multiplier, player_progress)
 		map(0, 0, cam.offset_x, cam.offset_y + old_layer_y_offset * 16)
+		if b.solved == 1 then
+			map(world.current_map[2].bmp, 0, 0, cam.offset_x, cam.offset_y + old_layer_y_offset * 16)
+		end
 		
 		draw_foxes()
 		
 		if player_progress > 0.5 then
-			map(world.next_map, 0, 0,
+			map(world.next_map[1].bmp, 0, 0,
 				cam.offset_x + 0,
 				cam.offset_y + new_layer_y_offset * 16)
 		end
 		
 		if player_progress >= 1.0 then
-			memmap(world.next_map, 0x100000)
+			memmap(world.next_map[1].bmp, 0x100000)
 			world.do_stair_climb = false
 			
 			level += 1
@@ -526,9 +532,9 @@ function _draw()
 			world.current_map = world.next_map
 
 			if level == 2 then
-				world.next_map = layer_after[1].bmp -- probably fix this at some point
+				world.next_map = layer_after -- probably fix this at some point
 			elseif level == 3 then
-				world.next_map = final_layer[1].bmp
+				world.next_map = final_layer
 			else
 				world.next_map = nil
 			end
@@ -548,6 +554,10 @@ function _draw()
 	else
 		-- Just render the map normally, no funny business
 		map(0, 0, cam.offset_x, cam.offset_y)
+		
+		if b.solved == 1 then
+			map(world.current_map[2].bmp, 0, 0, cam.offset_x, cam.offset_y)
+		end
 		draw_foxes()
 	end
 	
@@ -556,7 +566,7 @@ function _draw()
 	
 	-- Check if we are on stairs and initiate a climb
 	player_center = mget((p.x + (p.width/2))/16, (p.y + (p.height/2))/16);
-	if not world.do_stair_climb and player_center == 7 then
+	if not world.do_stair_climb and player_center == 15 then
 		world.do_stair_climb = true
 		world.stair_climb_start_y = (p.y + (p.height/2))/16
 		world.stair_climb_end_y = world.stair_climb_start_y - 4
@@ -583,7 +593,17 @@ function _draw()
 	pal()
 	
 	-- ui
-	print("HP: " .. p.hp, 10, 10, 7)
+	-- print("HP: " .. p.hp, 10, 10, 7)
+	clip()
+	if p.hp > 0 then
+		for i = 0,p.hp-1
+		do
+			spr(41, 4+20*i, 4)
+		end
+	else
+		print("You died! x(", 4, 4, 8)
+		print("HP: " .. p.hp, 4, 15, 8)
+	end
 	
 	-- debug
 	if show_hbox then
