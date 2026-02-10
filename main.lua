@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-08 09:27:06",revision=137]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-10 09:24:10",revision=163]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -7,7 +7,8 @@ include "box_detection.lua"
 function _init()
 	-- DEBUG
 	show_hbox = false	
-	show_menu = true
+	show_menu = false
+	COLLISION_DEBUG = true
 
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
@@ -598,5 +599,39 @@ function _draw()
 		print(tostr(fget(7,0)), 0+ cam.offset_x, 0 + cam.offset_y+16)
 	end
 	draw_boxes()
-
+	
+	if COLLISION_DEBUG then
+		local x = p.x
+		local y = p.y
+		corners = {
+			mget(x/16, (y-1)/16),
+			mget(((x+p.width)/16), (((y))/16)),
+			mget((x/16), ((y+p.height-1)/16)),
+			mget(((x+p.width)/16), ((y+p.height)/16)),
+		}
+		midpoints = {
+			mget((x+p.width/2)/16, y/16), --top middle
+			mget((x+p.width/2)/16, (y+p.height)/16), --bottom middle
+			mget(((x+p.width)/16), ((y+p.height/2)/16)), -- right middle
+			mget(((x)/16), ((y+p.height/2)/16)), -- left middle
+		}
+		a1 = fget(corners[1],0)
+		b1 = fget(corners[2],0)
+		c1 = fget(corners[3],0)
+		d1 = fget(corners[4],0)
+		e1 = fget(midpoints[1],0)
+		f1 = fget(midpoints[2],0)
+		g1 = fget(midpoints[3],0)
+		h1 = fget(midpoints[4],0)
+		print(tostr(a1), 0+cam.offset_x, 0+cam.offset_y)
+		print(tostr(b1), 0+cam.offset_x, 16+cam.offset_y)
+		print(tostr(c1), 0+cam.offset_x, 32+cam.offset_y)
+		print(tostr(d1), 0+cam.offset_x, 48+cam.offset_y)
+		print(tostr(e1), 0+cam.offset_x, 64+0+cam.offset_y)
+		print(tostr(f1), 0+cam.offset_x, 64+16+cam.offset_y)
+		print(tostr(g1), 0+cam.offset_x, 64+32+cam.offset_y)
+		print(tostr(h1), 0+cam.offset_x, 64+48+cam.offset_y)
+		print(tostr(p.x), -32+p.x+cam.offset_x, p.y+cam.offset_y)
+		print(tostr(b.x), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
+	end
 end

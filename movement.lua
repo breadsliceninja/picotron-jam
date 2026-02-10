@@ -1,4 +1,7 @@
+--[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-10 09:54:40",revision=80]]
 include "box_detection.lua"
+include "detect_walls.lua"
+include "math.lua"
 function move_player()
    START_SPEED = 1
 	-- left
@@ -130,10 +133,10 @@ function move_player()
 	-- get proposed borders around the character
 	-- used for collision against walls
 	-- assumes top left pixel of sprite
-	p_right	=	proposed_x - p.x_off + p.width 
+	p_right	=	proposed_x + p.width - p.x_off  
 	p_left 	= 	proposed_x + p.x_off
 	p_up 		=  proposed_y + p.y_off
-	p_down 	= 	proposed_y - p.y_off + p.height
+	p_down 	= 	proposed_y + p.height - p.y_off 
 
 	-- note: currently only supports one box (grimace emoji)
 	b_up_border 	= b.y
@@ -144,40 +147,59 @@ function move_player()
 	BOX_PUSH_SPEED = 1
 
 	-- if top of player edge is lower than top of box edge
+	-- is the acceleration causing the issue?
+	change_x = true
+	change_y = true
+	if detect_walls(p.x, proposed_y) then
+		change_y = false
+	end
+	if detect_walls(proposed_x, p.y) then
+		change_x = false
+	end
+	if not detect_walls(proposed_x, proposed_y) then
+		change_x = true
+		change_y = true
+	end
 
+	-- BOX COLLISION | RIGHT
 	-- RIGHT
-	if proposed_x > p.x then
-		-- if right edge is NOT hitting collision map block, move		
-		if not fget(mget((p_right)/16, (p.y+p.y_off)/16), 0) then
-			-- box collision
-			if p_right >= b_left_border and -- if going right 'into' the box
-				p.x < b_left_border and  	 -- but currently to the left of the box
-				p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
-				p.y + p.y_off < (b.y + b.height) then -- top edge of player above bottom edge of box
-				
-				proposed_bx = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
-				on_track(proposed_bx, b.y)
-				if b.on_track == 1 then
-					b.x = proposed_bx
-					p.x = b.x - b.width + p.x_off 
-				end	
-		
-		
-			else
-				p.x = proposed_x
-				
-			end
-		else
-			p.x = ((math.floor(proposed_x/16))*16)+p.x_off 
-			if (p.is_dashing) p.vx = -p.vx
+	
+--			-- box collision
+--	corners = {
+--		mget(x/16, y/16),							-- top left
+--		mget(((x+p.width-1)/16), ((y)/16)),	-- top right
+--		mget((x/16), ((y+p.height-1)/16)),					-- bottom left
+--		mget(((x+p.width-1)/16), ((y+p.height-1)/16)),	-- bottom right
+--	}
+	local box_pushed_x = false
+	local box_pushed_y = false
+	if proposed_x > p.x and 
+		(p.x+p.width-1) > b_left_border and -- if going right 'into' the box
+		p.x < b_right_border-b.width/2 and  	 -- but currently to the left of the box
+		p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
+		p.y + p.y_off < (b.y + b.height) then -- top edge of player above bottom edge of box
+--				
+		proposed_bx = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
+		on_track(proposed_bx, b.y)
+		if b.on_track == 1 then
+			box_pushed_x = true
+			b.x = proposed_bx
+			p.x = b.x - b.width + p.x_off
+		else -- if want to push onto box but box end of track, don't move
+			proposed_x = p.x 
+		end
+	end
 
+	if proposed_x > p.x then
+		if fget(mget((p_right)/16, (p.y+p.y_off)/16), 0) then
+--			p.x = ((math.floor(proposed_x/16))*16)+p.x_off 
+			if (p.is_dashing) p.vx = -p.vx
 		end
 	end
 	-- LEFT
 	if proposed_x < p.x then
-		if not fget(mget(p_left/16, (p.y+p.y_off)/16), 0) then
 			-- box collision
-			if proposed_x + p.x_off <= (b_right_border) and -- if new right going INTO box
+			if proposed_x + p.x_off < (b_right_border) and -- if new right going INTO box
 				p.x > b_right_border - p.x_off and          -- but currently to the right of box
 				p.y + p.height - p.y_off > b.y and 	 -- bottom of player lower than top of box
 				p.y < (b.y + b.height) - p.y_off then 
@@ -185,64 +207,75 @@ function move_player()
 				proposed_bx = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
 				on_track(proposed_bx, b.y)
 				if b.on_track == 1 then
+					box_pushed_x = true
 					b.x = proposed_bx
 					p.x = b.x + b.width 
+				else
+					proposed_x = p.x
 				end
-			else
-				p.x = proposed_x
 			end
-		else
-			p.x = ((math.ceil((proposed_x)/16))*16) - p.x_off
+		if fget(mget(p_left/16, (p.y+p.y_off)/16), 0) then
+--			p.x = ((math.ceil((proposed_x)/16))*16) - p.x_off
 			if (p.is_dashing) p.vx = -p.vx
 		end
 	end
-	-- UP
+--	-- UP
 	if proposed_y < p.y then
-		if not fget(mget((p.x+p.x_off)/16, (p_up)/16), 0) then
-			if proposed_y + p.y_off < b.y + p.height and -- if new right going INTO box
-				p.y + p.y_off > b.y + b.height and						-- and player bottom edge above box top edge
-				p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
-				p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
-				then
-				proposed_by = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
-				on_track(b.x, proposed_by)
-				if b.on_track == 1 then
-					b.y = proposed_by
-					p.y = b.y + b.height - (p.y_off-1)
-				end	
-				
+		if proposed_y + p.y_off < b.y + p.height and -- if new right going INTO box
+			p.y + p.y_off > b.y + b.height and						-- and player bottom edge above box top edge
+			p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
+			p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
+			then
+			proposed_by = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
+			on_track(b.x, proposed_by)
+			if b.on_track == 1 then
+				box_pushed_y = true
+				b.y = proposed_by
+				p.y = b.y + b.height - (p.y_off-1)
 			else
-				p.y = proposed_y
-			end
-		else
-			p.y = (math.ceil(proposed_y/16))*16 - p.y_off
+				proposed_y = p.y 			
+			end	
+		end
+		if fget(mget((p.x+p.x_off)/16, (p_up)/16), 0) then
+--			p.y = (math.ceil(proposed_y/16))*16 - p.y_off
 			if (p.is_dashing) p.vy = -p.vy
 		end
 	end
-	-- down
+--	-- down
 	if proposed_y > p.y then
 	
-		if not fget(mget((p.x+p.x_off)/16, (p_down)/16), 0) then
-			if proposed_y + p.height - p.y_off >= (b_up_border) and -- if new right going INTO box
-				p.y + p.height - p.y_off < b.y and						-- and player bottom edge above box top edge
-				p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
-				p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
-				then
-				
-				proposed_by = b.y + min(mid(-p.smax, p.vy, p.smax), BOX_PUSH_SPEED)
-				on_track(b.x, proposed_by)
-				if b.on_track == 1 then
-					b.y = proposed_by
-					p.y = b.y - b.height + (p.y_off-1)
-				end		
 		
-				
+		if proposed_y + p.height - p.y_off >= (b_up_border) and -- if new right going INTO box
+			p.y + p.height - p.y_off < b.y and						-- and player bottom edge above box top edge
+			p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
+			p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
+			then
+			
+			proposed_by = b.y + min(mid(-p.smax, p.vy, p.smax), BOX_PUSH_SPEED)
+			on_track(b.x, proposed_by)
+			if b.on_track == 1 then
+				box_pushed_y = true
+				b.y = proposed_by
+				p.y = b.y - b.height + (p.y_off-1)
 			else
-				p.y = proposed_y
-			end
-		else
-			p.y = ((math.floor(proposed_y/16))*16)+p.y_off
+				proposed_y = p.y 
+			end		
+
+		end
+		if fget(mget((p.x+p.x_off)/16, (p_down)/16), 0) then
+--			p.y = ((math.floor(proposed_y/16))*16)+p.y_off
 			if (p.is_dashing) p.vy = -p.vy
+		end
+	end
+
+	if not box_pushed_x then
+		if change_x then
+			p.x = proposed_x
+		end
+	end
+	if not box_pushed_y then
+		if change_y then
+			p.y = proposed_y
 		end
 	end
 end
