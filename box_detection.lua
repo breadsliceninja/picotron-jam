@@ -1,9 +1,9 @@
---[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-08 09:15:55",revision=116]]
+--[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-09 11:59:35",revision=122]]
 function all_boxes_solved()
 	if b.solved == 1 then
-		fset(7,0,false)
+		fset(15,0,false)
 	else
-		fset(7,0,true)
+		fset(15,0,true)
 	end
 end
 
