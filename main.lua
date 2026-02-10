@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-10 09:24:10",revision=163]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-10 10:03:18",revision=165]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -7,8 +7,8 @@ include "box_detection.lua"
 function _init()
 	-- DEBUG
 	show_hbox = false	
-	show_menu = false
-	COLLISION_DEBUG = true
+	show_menu = true
+	COLLISION_DEBUG = false
 
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
