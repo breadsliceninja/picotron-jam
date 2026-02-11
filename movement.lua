@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-10 09:54:40",revision=80]]
+--[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-11 09:41:15",revision=131]]
 include "box_detection.lua"
 include "detect_walls.lua"
 include "math.lua"
@@ -84,6 +84,7 @@ function move_player()
 		end
 		if n_pressed > 0 then
 			p.is_dashing = true
+			sfx(0,0)
 			p.dash_t = dash_dly
 		end
 		if n_pressed > 1 then
@@ -161,6 +162,7 @@ function move_player()
 		change_y = true
 	end
 
+
 	-- BOX COLLISION | RIGHT
 	-- RIGHT
 	
@@ -171,6 +173,7 @@ function move_player()
 --		mget((x/16), ((y+p.height-1)/16)),					-- bottom left
 --		mget(((x+p.width-1)/16), ((y+p.height-1)/16)),	-- bottom right
 --	}
+	box_push_try = false -- does the player try to push a box? (reguardless of if its off track)
 	local box_pushed_x = false
 	local box_pushed_y = false
 	if proposed_x > p.x and 
@@ -181,6 +184,7 @@ function move_player()
 --				
 		proposed_bx = b.x + min(mid(-p.smax, p.vx, p.smax), BOX_PUSH_SPEED)
 		on_track(proposed_bx, b.y)
+		box_push_try = true
 		if b.on_track == 1 then
 			box_pushed_x = true
 			b.x = proposed_bx
@@ -206,6 +210,7 @@ function move_player()
 				-- top edge of player above bottom edge of box
 				proposed_bx = b.x + max(mid(-p.smax, p.vx, p.smax), - BOX_PUSH_SPEED)
 				on_track(proposed_bx, b.y)
+				box_push_try = true
 				if b.on_track == 1 then
 					box_pushed_x = true
 					b.x = proposed_bx
@@ -228,8 +233,9 @@ function move_player()
 			then
 			proposed_by = b.y - min(abs(mid(-p.smax, p.vy, p.smax)), BOX_PUSH_SPEED)
 			on_track(b.x, proposed_by)
+			box_push_try = true
 			if b.on_track == 1 then
-				box_pushed_y = true
+				box_push_y = true
 				b.y = proposed_by
 				p.y = b.y + b.height - (p.y_off-1)
 			else
@@ -250,7 +256,7 @@ function move_player()
 			p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
 			p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
 			then
-			
+			box_push_try = true
 			proposed_by = b.y + min(mid(-p.smax, p.vy, p.smax), BOX_PUSH_SPEED)
 			on_track(b.x, proposed_by)
 			if b.on_track == 1 then
@@ -278,6 +284,17 @@ function move_player()
 			p.y = proposed_y
 		end
 	end
+
+	-- SFX
+	if box_push_try and not box_push_try_last_frame then
+		sfx(1,1) --todo loop sfx
+	end
+	if not box_push_try then
+		sfx(-1,1) -- stop sfx
+	end
+	box_push_try_last_frame = box_push_try 
+
+
 end
 
 function hurt_player()

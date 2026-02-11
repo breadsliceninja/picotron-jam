@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-10 10:03:18",revision=165]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-11 09:29:12",revision=191]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -8,7 +8,19 @@ function _init()
 	-- DEBUG
 	show_hbox = false	
 	show_menu = true
-	COLLISION_DEBUG = false
+	COLLISION_DEBUG = true
+--	sfx_i,spd = 1,2
+--	local addr=0x3200+(68*sfx_i)+64+1
+--	poke(m em_addr,spd)
+
+	-- sfx (for channel and sfx)
+	-- note: channels
+	SFX_DASH = 0
+	SFX_WALL_HIT = 1
+	SFX_BOX_PUSH = 2
+	box_push_last_frame = false
+	box_push_try = false
+	box_push_try_last_frame = false
 
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
@@ -16,6 +28,7 @@ function _init()
 	dash_dly = 24
 	dash_spd = 5
 	invul_dly = 90
+	song = "menu"
 	p = {
 		x = 16*4,
 		y = 16*4,
@@ -218,7 +231,10 @@ end
 function _update()
 	
 	if show_menu then return end
-
+	if song == "menu" then
+		music(0, 1000)
+		song = "level"
+	end
 	-- called each frame (60 times)
 	move_player()
 	detect_box_solve()
@@ -651,7 +667,9 @@ function _draw()
 		print(tostr(f1), 0+cam.offset_x, 64+16+cam.offset_y)
 		print(tostr(g1), 0+cam.offset_x, 64+32+cam.offset_y)
 		print(tostr(h1), 0+cam.offset_x, 64+48+cam.offset_y)
-		print(tostr(p.x), -32+p.x+cam.offset_x, p.y+cam.offset_y)
-		print(tostr(b.x), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
-	end
+--		print(tostr(p.x), -32+p.x+cam.offset_x, p.y+cam.offset_y)
+--		print(tostr(b.x), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
+		print(tostr(box_push_try), -32+p.x+cam.offset_x, p.y+cam.offset_y)
+		print(tostr(box_push_try_last_frame), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
+	end	
 end
