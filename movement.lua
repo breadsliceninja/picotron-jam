@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-11 09:41:15",revision=131]]
+--[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-11 09:53:04",revision=145]]
 include "box_detection.lua"
 include "detect_walls.lua"
 include "math.lua"
@@ -226,7 +226,7 @@ function move_player()
 	end
 --	-- UP
 	if proposed_y < p.y then
-		if proposed_y + p.y_off < b.y + p.height and -- if new right going INTO box
+		if proposed_y - p.y_off <= b.y + p.height and -- if new right going INTO box
 			p.y + p.y_off > b.y + b.height and						-- and player bottom edge above box top edge
 			p.x + p.x_off < b_left_border + b.width and 			-- left edge is to the left of box right border
 			p.x + p.width - p.x_off > b_left_border         	-- but currently to the right of box
@@ -235,9 +235,9 @@ function move_player()
 			on_track(b.x, proposed_by)
 			box_push_try = true
 			if b.on_track == 1 then
-				box_push_y = true
+				box_pushed_y = true
 				b.y = proposed_by
-				p.y = b.y + b.height - (p.y_off-1)
+				p.y = b.y + b.height + (p.y_off-1)
 			else
 				proposed_y = p.y 			
 			end	
