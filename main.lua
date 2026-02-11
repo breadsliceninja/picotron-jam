@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-11 09:29:12",revision=191]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-11 09:45:13",revision=192]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -8,7 +8,7 @@ function _init()
 	-- DEBUG
 	show_hbox = false	
 	show_menu = true
-	COLLISION_DEBUG = true
+	COLLISION_DEBUG = false
 --	sfx_i,spd = 1,2
 --	local addr=0x3200+(68*sfx_i)+64+1
 --	poke(m em_addr,spd)
