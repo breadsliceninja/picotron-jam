@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-09 09:26:29",modified="2026-02-10 09:39:26",revision=19]]
+--[[pod_format="raw",created="2026-02-09 09:26:29",modified="2026-02-12 08:55:23",revision=21]]
 include "math.lua"
 function detect_walls(x,y)
     
@@ -27,7 +27,7 @@ function detect_walls(x,y)
 		fget(midpoints[1],0) or
 		fget(midpoints[2],0) or
 		fget(midpoints[3],0) or
-		fget(midpoints[4],0)
+  		fget(midpoints[4],0)
 	 	then
 			return true
 	end

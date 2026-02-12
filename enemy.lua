@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:39:18",modified="2026-02-08 07:39:34",revision=1]]
+--[[pod_format="raw",created="2026-02-08 07:39:18",modified="2026-02-12 10:01:55",revision=19]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
@@ -49,6 +49,8 @@ function create_fox(x,y)
 		time_counter = 0,
 		projectile_counter = 0,
 		particle_system = {},
+		alert_sfx = true,
+		knockout_sfx = true
 	}
 end
 
@@ -72,6 +74,7 @@ function process_fox(fox)
 		p_top < c_bottom and
 		p_bottom > c_top then
 		if p.is_dashing then
+			fox.knockout_sfx = true
 			fox.state = FOX_DIZZY
 			fox.time_counter = 0
 			p.vx *= -1
@@ -297,12 +300,22 @@ function draw_fox(fox)
 				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
 				cam.offset_y + fox.y - 12,
 				18)
+			if fox.knockout_sfx then
+				sfx(36,13)
+				fox.knockout_sfx = false
+				fox.alert_sfx = true
+			end
 		elseif fox.proj_counter < 0 then
 			print("Zzz",
 				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
 				cam.offset_y + fox.y - 12,
 				18)
+			fox.alert_sfx = true
 		else
+			if fox.alert_sfx then
+				sfx(35,13)
+				fox.alert_sfx = false
+			end
 			print("!!",
 				cam.offset_x + fox.x + fox.sprite_x_offset - 4,
 				cam.offset_y + fox.y - 12,

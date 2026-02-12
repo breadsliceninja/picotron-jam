@@ -1,7 +1,11 @@
---[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-09 11:59:35",revision=122]]
+--[[pod_format="raw",created="2026-02-08 02:15:28",modified="2026-02-12 09:34:19",revision=128]]
 function all_boxes_solved()
 	if b.solved == 1 then
 		fset(15,0,false)
+		if key_play_sfx then
+			sfx(32,15)
+			key_play_sfx = false
+		end
 	else
 		fset(15,0,true)
 	end

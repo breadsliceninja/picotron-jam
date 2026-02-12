@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-11 09:45:13",revision=192]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-12 10:05:07",revision=216]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -9,6 +9,7 @@ function _init()
 	show_hbox = false	
 	show_menu = true
 	COLLISION_DEBUG = false
+	key_play_sfx = true
 --	sfx_i,spd = 1,2
 --	local addr=0x3200+(68*sfx_i)+64+1
 --	poke(m em_addr,spd)
@@ -28,7 +29,7 @@ function _init()
 	dash_dly = 24
 	dash_spd = 5
 	invul_dly = 90
-	song = "menu"
+	song = "none"
 	p = {
 		x = 16*4,
 		y = 16*4,
@@ -46,7 +47,7 @@ function _init()
 		particles = {},
 		is_dashing = false,
 		dash_t = 0,
-		hp = 3,
+		hp = 7,
 		invul_t = 0,
 		hbox = {
 			x = 9,
@@ -230,8 +231,13 @@ end
 
 function _update()
 	
+	if song == "none" then
+		music(12,1000)
+		song = "menu"
+	end
 	if show_menu then return end
 	if song == "menu" then
+		music(-1,1000)
 		music(0, 1000)
 		song = "level"
 	end
@@ -465,6 +471,7 @@ function _draw()
 			end
 			rectfill(78, 218, 78+325, 218+11, 0)
 			print("Copyright (c) 2026 - "..name1..", "..name2..", "..name3, 80, 220, 7)
+			music(-1, 1000)
 		end
 		
 		if key("space") and menu_debounce_counter > 10 then
@@ -479,7 +486,7 @@ function _draw()
 				menu_debounce_counter = 0
 			elseif menu_anim_counter < SCENE_1 then
 				menu_anim_counter = SCENE_1
-				menu_debounce_counter = 0
+				menu_debounce_counter = 0 
 			elseif menu_anim_counter < SCENE_2 then
 				menu_anim_counter = SCENE_2
 				menu_debounce_counter = 0
@@ -542,6 +549,7 @@ function _draw()
 			world.do_stair_climb = false
 			
 			level += 1
+			key_play_sfx = true
 			
 			-- Update maps
 			world.previous_previous_map = world.previous_map

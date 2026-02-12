@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-11 09:53:04",revision=145]]
+--[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-12 09:51:28",revision=148]]
 include "box_detection.lua"
 include "detect_walls.lua"
 include "math.lua"
@@ -84,7 +84,7 @@ function move_player()
 		end
 		if n_pressed > 0 then
 			p.is_dashing = true
-			sfx(0,0)
+			sfx(0,12)
 			p.dash_t = dash_dly
 		end
 		if n_pressed > 1 then
@@ -300,6 +300,7 @@ end
 function hurt_player()
 	if (p.is_dashing) return
 	p.hp -= 1
+	sfx(34,14)
 	if p.hp <= 0 then
 		-- TODO: kill player
 	end
