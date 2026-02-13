@@ -1,7 +1,6 @@
---[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-12 09:51:28",revision=148]]
+--[[pod_format="raw",created="2026-02-09 09:26:36",modified="2026-02-13 05:46:25",revision=150]]
 include "box_detection.lua"
 include "detect_walls.lua"
-include "math.lua"
 function move_player()
    START_SPEED = 1
 	-- left
@@ -196,7 +195,7 @@ function move_player()
 
 	if proposed_x > p.x then
 		if fget(mget((p_right)/16, (p.y+p.y_off)/16), 0) then
---			p.x = ((math.floor(proposed_x/16))*16)+p.x_off 
+--			p.x = ((flr(proposed_x/16))*16)+p.x_off 
 			if (p.is_dashing) p.vx = -p.vx
 		end
 	end
@@ -220,7 +219,7 @@ function move_player()
 				end
 			end
 		if fget(mget(p_left/16, (p.y+p.y_off)/16), 0) then
---			p.x = ((math.ceil((proposed_x)/16))*16) - p.x_off
+--			p.x = ((ceil((proposed_x)/16))*16) - p.x_off
 			if (p.is_dashing) p.vx = -p.vx
 		end
 	end
@@ -243,7 +242,7 @@ function move_player()
 			end	
 		end
 		if fget(mget((p.x+p.x_off)/16, (p_up)/16), 0) then
---			p.y = (math.ceil(proposed_y/16))*16 - p.y_off
+--			p.y = (ceil(proposed_y/16))*16 - p.y_off
 			if (p.is_dashing) p.vy = -p.vy
 		end
 	end
@@ -269,7 +268,7 @@ function move_player()
 
 		end
 		if fget(mget((p.x+p.x_off)/16, (p_down)/16), 0) then
---			p.y = ((math.floor(proposed_y/16))*16)+p.y_off
+--			p.y = ((flr(proposed_y/16))*16)+p.y_off
 			if (p.is_dashing) p.vy = -p.vy
 		end
 	end
@@ -298,7 +297,7 @@ function move_player()
 end
 
 function hurt_player()
-	if (p.is_dashing) return
+	if (p.is_dashing or p.invul_t > 0) return
 	p.hp -= 1
 	sfx(34,14)
 	if p.hp <= 0 then
