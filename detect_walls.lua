@@ -1,10 +1,9 @@
---[[pod_format="raw",created="2026-02-09 09:26:29",modified="2026-02-12 08:55:23",revision=21]]
-include "math.lua"
+--[[pod_format="raw",created="2026-02-09 09:26:29",modified="2026-02-13 05:26:15",revision=22]]
 function detect_walls(x,y)
     
    -- round x and y to each int
-   local x = math.floor(x + 0.5)
-   local y = math.floor(y + 0.5)
+   local x = flr(x + 0.5)
+   local y = flr(y + 0.5)
 
    -- what map tile is each corner on?   
 	corners = {

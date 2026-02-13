@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-08 06:13:20",revision=188]]
+--[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-13 05:57:23",revision=192]]
 MAX_PARTICLES = 1000
 
 function create_particle_config()
@@ -81,9 +81,27 @@ function process_particles(system, is_collidable)
 			if p_left < c_right and
 				p_right > c_left and
 				p_top < c_bottom and
-				p_bottom > c_top then
+				p_bottom > c_top
+			then
 				hurt_player()
 				particle.lifespan = -1	
+			end
+			
+			-- box
+			for i = 1,#level_boxes[level] do
+				local b = level_boxes[level][i]
+				local b_left = b.x
+				local b_right = b.x + b.width
+				local b_top = b.y
+				local b_bottom = b.y + b.height
+				
+				if b_left < c_right and
+					b_right > c_left and
+					b_top < c_bottom and
+					b_bottom > c_top
+				then
+					particle.lifespan = -1	
+				end
 			end
 		end
 		
