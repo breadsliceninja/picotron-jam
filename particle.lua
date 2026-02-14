@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-13 05:57:23",revision=192]]
+--[[pod_format="raw",created="2026-02-08 02:53:23",modified="2026-02-14 23:04:46",revision=193]]
 MAX_PARTICLES = 1000
 
 function create_particle_config()
@@ -100,7 +100,9 @@ function process_particles(system, is_collidable)
 					b_top < c_bottom and
 					b_bottom > c_top
 				then
-					particle.lifespan = -1	
+					-- particle.lifespan = -1
+					particle.vx *= -1
+					particle.vy *= -1	
 				end
 			end
 		end
