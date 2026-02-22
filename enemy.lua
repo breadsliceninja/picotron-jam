@@ -1,8 +1,10 @@
---[[pod_format="raw",created="2026-02-08 07:39:18",modified="2026-02-12 10:01:55",revision=19]]
+--[[pod_format="raw",created="2026-02-08 07:39:18",modified="2026-02-22 12:21:56",revision=61]]
 -- turning speed
 -- field of view
 -- dash out of fov, then it gets confused and starts searching
 -- launches projectiles with short cooldown
+
+include "math.lua"
 
 FOX_IDLE = 0
 FOX_SPOTTED = 1
@@ -29,7 +31,12 @@ ANIM_DIZZY_COOLDOWN = 400
 
 BURST_SIZE = 20
 
-function create_fox(x,y)
+function create_fox(x,y,blue)
+	if blue == true then
+		palette = 64
+	else
+		palette = 0
+	end
 	return {
 		x = x,
 		y = y,
@@ -50,7 +57,9 @@ function create_fox(x,y)
 		projectile_counter = 0,
 		particle_system = {},
 		alert_sfx = true,
-		knockout_sfx = true
+		knockout_sfx = true,
+		palette=palette,
+		blue=blue
 	}
 end
 
@@ -139,12 +148,20 @@ function process_fox(fox)
 	if fox.state == FOX_TRACKING then
 		fox.view_fov = FOV_SPOTTED
 		fox.view_distance = DIST_SPOTTED
-		fox.proj_counter += 1
+		if fox.blue then
+			fox.proj_counter += 1
+		else
+			fox.proj_counter += 1
+		end
 		
-		if fox.proj_counter > (ANIM_FIRE_PROJECTILE_DURATION * BURST_SIZE) then
+		if fox.blue == false and fox.proj_counter > (ANIM_FIRE_PROJECTILE_DURATION * BURST_SIZE) then
 			fox.proj_counter = -ANIM_FIRE_PROJECTILE_COOLDOWN
 		end
 		
+		if fox.blue == true and fox.proj_counter > (ANIM_FIRE_PROJECTILE_DURATION * (BURST_SIZE/3)) then
+			fox.proj_counter = -ANIM_FIRE_PROJECTILE_COOLDOWN
+		end	
+
 		fox.view_current_angle = calc_angle_to_player(fox)
 		
 		local distance_to_player = calc_distance_to_player(fox)
@@ -157,8 +174,14 @@ function process_fox(fox)
 			end
 		else
 			fox.time_counter = 0
-			
-			if fox.proj_counter > 0 and fox.proj_counter % ANIM_FIRE_PROJECTILE_DURATION == 0 then
+			if fox.blue then
+				fire_projectile_duraction = math.floor(ANIM_FIRE_PROJECTILE_DURATION/2)
+			else
+				fire_projectile_duraction = ANIM_FIRE_PROJECTILE_DURATION
+			end
+				
+--			math.round(ANIM_FIRE_PROJECTILE_DURATION / 1.5)
+			if fox.proj_counter > 0 and fox.proj_counter % fire_projectile_duraction == 0 then
 				local fox_center_x = fox.x + fox.sprite_x_offset
 				local fox_head_y = fox.y + 20
 		
@@ -169,6 +192,10 @@ function process_fox(fox)
 				local dir_y = player_center_y - fox_head_y
 				
 				local magnitude = sqrt(dir_x^2 + dir_y^2)
+				-- fireballs are faster if blue fox
+				if fox.blue then
+					magnitude = magnitude / 1.5
+				end
 				local norm_dir_x = dir_x / magnitude
 				local norm_dir_y = dir_y / magnitude
 				
@@ -177,9 +204,14 @@ function process_fox(fox)
 				config.y = fox_head_y
 				config.vx = 1 * norm_dir_x
 				config.vy = 1 * norm_dir_y
-				config.colour = 8
-				config.alt_colour = 9
-				config.colour_change_duration = 32
+				if fox.blue == true then
+					config.colour = 12
+					config.alt_colour = 28
+				else
+					config.colour = 23
+					config.alt_colour = 14
+				end
+				config.colour_change_duration = 24
 				config.radius = 4
 				config.glow_radius = 5
 				config.glow_colour = 10
@@ -277,13 +309,13 @@ function draw_fox(fox)
 	draw_particles(fox.particle_system)
 	
 	if fox.view_current_angle > 45 and fox.view_current_angle <= 135 then
-		spr(SPRITE_SIDE, cam.offset_x + fox.x, cam.offset_y + fox.y)
+		spr(SPRITE_SIDE + fox.palette, cam.offset_x + fox.x, cam.offset_y + fox.y)
 	elseif fox.view_current_angle > 135 and fox.view_current_angle <= 225 then
-		spr(SPRITE_UP, cam.offset_x + fox.x, cam.offset_y + fox.y)
+		spr(SPRITE_UP + fox.palette, cam.offset_x + fox.x, cam.offset_y + fox.y)
 	elseif fox.view_current_angle > 225 and fox.view_current_angle <= 315 then
-		spr(SPRITE_SIDE, cam.offset_x + fox.x, cam.offset_y + fox.y, true)
+		spr(SPRITE_SIDE + fox.palette, cam.offset_x + fox.x, cam.offset_y + fox.y, true)
 	else
-		spr(SPRITE_DOWN, cam.offset_x + fox.x, cam.offset_y + fox.y)
+		spr(SPRITE_DOWN + fox.palette, cam.offset_x + fox.x, cam.offset_y + fox.y)
 	end
 	
 	if show_hbox then

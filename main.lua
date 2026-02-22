@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-22 11:09:32",revision=351]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-22 12:12:23",revision=363]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -102,21 +102,21 @@ function _init()
 	level = 1
 	
 	-- Level 1
-	fox1 = create_fox(22*16, 10*16)
-	fox2 = create_fox(23*16, 19*16)
+	fox1 = create_fox(22*16, 10*16, false)
+	fox2 = create_fox(23*16, 19*16, false)
 	-- Level 2
-	fox3 = create_fox(22*16, 7 *16)
-	fox4 = create_fox(13*16, 14*16)
-	fox5 = create_fox(3*16, 11*16)
-	fox6 = create_fox(18*16, 22*16)
+	fox3 = create_fox(22*16, 7 *16, true)
+	fox4 = create_fox(13*16, 14*16, false)
+	fox5 = create_fox(3*16, 11*16, false)
+	fox6 = create_fox(18*16, 22*16, true)
 	-- Level 3
-	fox7 = create_fox(1*16, 2*16)
+	fox7 = create_fox(1*16, 2*16, false)
 	-- Level 3
-	fox8 = create_fox(23*16, 13*16)
-	fox9 = create_fox(19*16, 9*16)
-	fox10 = create_fox(28*16, 3*16)
-	fox11 = create_fox(12*16, 0)
-	fox12 = create_fox(1*16, 0)
+	fox8 = create_fox(23*16, 13*16, true)
+	fox9 = create_fox(19*16, 9*16, false)
+	fox10 = create_fox(28*16, 3*16, false)
+	fox11 = create_fox(12*16, 0, true)
+	fox12 = create_fox(1*16, 0, false)
 	
 	-- Level 1
 	box1 = {
