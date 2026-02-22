@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-13 05:54:12",revision=217]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-22 11:09:32",revision=351]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
@@ -8,6 +8,7 @@ function _init()
 	-- DEBUG
 	show_hbox = false	
 	show_menu = true
+	show_game_over = false
 	COLLISION_DEBUG = false
 	key_play_sfx = true
 --	sfx_i,spd = 1,2
@@ -47,7 +48,7 @@ function _init()
 		particles = {},
 		is_dashing = false,
 		dash_t = 0,
-		hp = 7,
+		hp = 10,
 		invul_t = 0,
 		hbox = {
 			x = 9,
@@ -354,6 +355,37 @@ function _draw()
 	-- each tile is 16x16
 	cls()
 	
+	if show_game_over then
+		music(-1)
+		sfx(-1)
+
+		cls(0)
+ 		cam.target_offset_x = 600
+		cam.target_offset_y = 600	
+		width = (screen_width - 60*3)-12 + 40*2
+		height = 100
+		rx = 16*6 - 40
+		ry = 60
+		rectfill(rx, ry, rx+width, ry+height, 24)
+		rectfill(rx, ry, rx+width, ry+(height/3)*2, 8)
+
+
+--		spr(18, 16*8, 16*6)
+		spr(22, 16*22, 16*6)
+		spr(22, 16*18, 16*6)		
+		spr(22, 16*14, 16*6)
+		spr(22, 16*10, 16*6)
+		spr(22, 16*6, 16*6)
+--		map(0, 0, 20, 20, 4, 2)
+		print("Game Over ...", 90, 40, 7)
+		print("Press space to restart ...", 160, 180, 7)
+--		rectfill(40, 60, screen_width - 40, 140, 0)
+--		spr(rabbit_sprite_idx, 120, 90)
+		if key("space") then
+			_init()
+		end
+	end
+	
 	if show_menu then
 		menu_anim_counter += 1
 		menu_debounce_counter += 1
@@ -497,7 +529,6 @@ function _draw()
 
 		return
 	end
-	
 	-- Set clip to prevent drawing underlayers behind current layer
 	local clip_rect_x = cam.offset_x
 	local clip_rect_y = cam.offset_y
@@ -574,6 +605,7 @@ function _draw()
 			cam.target_offset_y = cam.offset_y
 			
 			-- Update player location
+			
 			p.y -= 16 * overlap_scroll
 		end
 	else
@@ -626,8 +658,9 @@ function _draw()
 			spr(41, 4+20*i, 4)
 		end
 	else
-		print("You died! x(", 4, 4, 8)
-		print("HP: " .. p.hp, 4, 15, 8)
+		show_game_over = true
+--		print("You died! x(", 4, 4, 8)
+--		print("HP: " .. p.hp, 4, 15, 8)
 	end
 	
 	-- debug
