@@ -4,8 +4,6 @@
 -- dash out of fov, then it gets confused and starts searching
 -- launches projectiles with short cooldown
 
-include "math.lua"
-
 FOX_IDLE = 0
 FOX_SPOTTED = 1
 FOX_TRACKING = 2
