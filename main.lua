@@ -1,8 +1,9 @@
---[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-02-22 12:12:23",revision=363]]
+--[[pod_format="raw",created="2026-02-08 07:38:29",modified="2026-03-11 07:21:03",revision=384]]
 include "movement.lua"
 include "enemy.lua"
 include "particle.lua"
 include "box_detection.lua"
+include "reset.lua"
 
 function _init()
 	-- DEBUG
@@ -23,6 +24,7 @@ function _init()
 	box_push_last_frame = false
 	box_push_try = false
 	box_push_try_last_frame = false
+	PLAYER_MAX_HEALTH = 10
 
 	normal = 0
 	poke(0x5f5c, 255) -- diasable key repeat
@@ -48,7 +50,7 @@ function _init()
 		particles = {},
 		is_dashing = false,
 		dash_t = 0,
-		hp = 10,
+		hp = PLAYER_MAX_HEALTH,
 		invul_t = 0,
 		hbox = {
 			x = 9,
@@ -119,32 +121,41 @@ function _init()
 	fox12 = create_fox(1*16, 0, false)
 	
 	-- Level 1
+
 	box1 = {
 		x = 22*16,
 		y = 4*16,
+		start_x = 22*16, 
+		start_y = 4*16,
 		width = 32, height = 32,
-		solved = 0, on_track = 1
+		solved = 0, on_track = 1,
 	}
 
 	box2 = {
 		x = 16*8,
 		y = 16*25,
+		start_x = 16*8, 
+		start_y = 16*25,
 		width = 32, height = 32,
-		solved = 0, on_track = 1
+		solved = 0, on_track = 1,
 	}
 	
 	box3 = {
 		x = 15*16,
 		y = 16*16,
+		start_x = 15*16, 
+		start_y = 16*16,
 		width = 32, height = 32,
-		solved = 0, on_track = 1
+		solved = 0, on_track = 1,
 	}
 
 	box4 = {
 		x = 16*32,
 		y = 16*32,
+		start_x = 16*32, 
+		start_y = 16*32,
 		width = 32, height = 32,
-		solved = 0, on_track = 1
+		solved = 0, on_track = 1,
 	}
 
 	level1_boxes = {}
@@ -381,8 +392,15 @@ function _draw()
 		print("Press space to restart ...", 160, 180, 7)
 --		rectfill(40, 60, screen_width - 40, 140, 0)
 --		spr(rabbit_sprite_idx, 120, 90)
+
 		if key("space") then
-			_init()
+			-- reset world, level and box
+			reset_player()
+			reset_foxes()
+			reset_box()
+			show_game_over = false
+			show_menu = true
+			
 		end
 	end
 	
@@ -708,9 +726,9 @@ function _draw()
 		print(tostr(f1), 0+cam.offset_x, 64+16+cam.offset_y)
 		print(tostr(g1), 0+cam.offset_x, 64+32+cam.offset_y)
 		print(tostr(h1), 0+cam.offset_x, 64+48+cam.offset_y)
---		print(tostr(p.x), -32+p.x+cam.offset_x, p.y+cam.offset_y)
---		print(tostr(b.x), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
-		print(tostr(box_push_try), -32+p.x+cam.offset_x, p.y+cam.offset_y)
-		print(tostr(box_push_try_last_frame), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
+		print(tostr(p.x), -32+p.x+cam.offset_x, p.y+cam.offset_y)
+		print(tostr(p.y), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
+--		print(tostr(box_push_try), -32+p.x+cam.offset_x, p.y+cam.offset_y)
+--		print(tostr(box_push_try_last_frame), -32+p.x+cam.offset_x, p.y+16+cam.offset_y)
 	end	
 end
