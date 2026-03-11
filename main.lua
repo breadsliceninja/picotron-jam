@@ -191,9 +191,9 @@ function _init()
 	world.next_map = next_layer
 	
 	local names = {
-		"Ollie Hogue",
-		"Matthew Jakeman",
-		"Bodhi Tuladhar"
+		"Ollie",
+		"Matthew",
+		"Bodhi"
 	}
 	local permutations = {
 		{1,2,3},
@@ -519,8 +519,10 @@ function _draw()
 				rectfill(188, 178, 188+97, 178+11, 0)
 				print("Press Space to Play", 190, 180, 7)
 			end
-			rectfill(78, 218, 78+325, 218+11, 0)
-			print("Copyright (c) 2026 - "..name1..", "..name2..", "..name3, 80, 220, 7)
+			WORD_X = 80+93
+			WORD_Y = 220
+			rectfill(WORD_X-2, WORD_Y-2, WORD_X-2+130, WORD_Y-2+11, 0)
+			print("By "..name1..", "..name2..", & "..name3, WORD_X, WORD_Y, 7)
 			music(-1, 1000)
 		end
 		
